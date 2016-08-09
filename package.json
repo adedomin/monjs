@@ -1,0 +1,20 @@
+{
+  "name": "ezios",
+  "version": "0.0.1",
+  "description": "nagios, but more dynamic",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+	"bundle": "browserify resources/index.js | uglifyjs -m -o resources/index.bundle.min.js"
+  },
+  "keywords": [
+    "monitoring",
+    "nagios"
+  ],
+  "author": "Anthony DeDominic <anthony@dedominic.pw>",
+  "license": "GPLv3",
+  "dependencies": {
+    "express": "^4.14.0",
+    "nedb": "^1.8.0"
+  }
+}
