@@ -23,6 +23,9 @@ var config = require('../config/test'),
  * command_name - String
  * type - String {external|js}
  * path - String (Filesystem path)
+ * args - List (["-a", "some arg", 
+ *               "-b", "$1$",
+ *               "-c", "$HOSTNAME$"])
  */
 module.exports = () => {
     

@@ -16,4 +16,4 @@
    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-require('lib/init.js')()
+require('./lib/init.js')()
