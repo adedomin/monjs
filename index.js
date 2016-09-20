@@ -24,9 +24,11 @@ var config = require('./config/test'),
     waterfall = require('async/waterfall'),
     Scheduler = require('./lib/Scheduler'),
     executor = require('./lib/executor'),
-    perfparser = require('./lib/perf-parser')
+    perfparser = require('./lib/perf-parser'),
+    logger = require('winston')
 
-var scheduler = new Scheduler(db)
+var scheduler = new Scheduler(db),
+    STATUS = {} // note this is in memory!
 
 scheduler.on('service.external', (host, service) => {
     var status_code = -1
@@ -37,15 +39,25 @@ scheduler.on('service.external', (host, service) => {
             perfparser(output, next)
         },
         (output, perfdata, next) => {
-            db.put(
-                `status.${host.host_name}.${service.service_name}`,
-                {
-                    status: status_code,
-                    output: output,
-                    perfdata: perfdata || 'n/a'
-                },
-                next
+            if (!STATUS[host.name]) 
+                STATUS[host.name] = {}
+            if (!STATUS[host.name][service.name])
+                STATUS[host.name][service.name] = {}
+
+            STATUS[host.name][service.name] = {
+                status: status_code,
+                output: output,
+                perfdata: perfdata || 'n/a'
+            }
+
+            logger.log(
+                'info',
+                `${host.name}-${service.name}: ${output}`
             )
+
+            next(null)
         }
-    ])
+    ], (err) => {
+        if (err) logger.log('error', err)
+    })
 })
