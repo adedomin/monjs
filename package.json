@@ -5,16 +5,22 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-	"bundle": "browserify resources/index.js | uglifyjs -m -o resources/index.bundle.min.js"
+    "bundle": "./node_modules/.bin/browserify resources/index.js | ./node_modules/.bin/uglifyjs -m -o resources/index.bundle.min.js"
   },
   "keywords": [
     "monitoring",
     "nagios"
   ],
+  "repository": "https://github.com/GeneralUnRest/ezios.git",
   "author": "Anthony DeDominic <anthony@dedominic.pw>",
   "license": "GPLv3",
   "dependencies": {
+    "async": "^2.0.1",
+    "body-parser": "^1.15.2",
+    "browserify": "^13.1.0",
+    "cookie-parser": "^1.4.3",
     "express": "^4.14.0",
-    "nedb": "^1.8.0"
+    "level": "^1.4.0",
+    "uglifyjs": "^2.4.10"
   }
 }

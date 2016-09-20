@@ -1,11 +1,6 @@
 var config = {}
 
-config.db = {
-    host: '../db/host.db',
-    contact: '../db/contact.db',
-    command: '../db/command.db',
-    status: '../db/status.db'
-}
+config.db = './db/host-service.db'
 
 config.http = {
     root: '/',

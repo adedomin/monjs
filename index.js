@@ -16,4 +16,36 @@
    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-require('./lib/init.js')()
+var config = require('./config/test'),
+    db = require('level')(
+        config.db_path,
+        { valueEncoding: 'json' }
+    ),
+    waterfall = require('async/waterfall'),
+    Scheduler = require('./lib/Scheduler'),
+    executor = require('./lib/executor'),
+    perfparser = require('./lib/perf-parser')
+
+var scheduler = new Scheduler(db)
+
+scheduler.on('service.external', (host, service) => {
+    var status_code = -1
+    waterfall([
+        (next) => executor(host, service, next),
+        (code, output, next) => {
+            status_code = code
+            perfparser(output, next)
+        },
+        (output, perfdata, next) => {
+            db.put(
+                `status.${host.host_name}.${service.service_name}`,
+                {
+                    status: status_code,
+                    output: output,
+                    perfdata: perfdata || 'n/a'
+                },
+                next
+            )
+        }
+    ])
+})
