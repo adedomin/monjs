@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "bundle": "./node_modules/.bin/browserify resources/index.js | ./node_modules/.bin/uglifyjs -m -o resources/index.bundle.min.js"
+    "bundle": "./node_modules/.bin/browserify resources/index.js | ./node_modules/.bin/uglifyjs -m -o resources/index.bundle.min.js",
+    "start": "node index.js"
   },
   "keywords": [
     "monitoring",

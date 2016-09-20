@@ -17,47 +17,17 @@
 */
 
 var config = require('./config/test'),
+    STATUS = {}, // note this is in memory!
     db = require('level')(
-        config.db_path,
+        config.db,
         { valueEncoding: 'json' }
     ),
-    waterfall = require('async/waterfall'),
     Scheduler = require('./lib/Scheduler'),
-    executor = require('./lib/executor'),
-    perfparser = require('./lib/perf-parser'),
     logger = require('winston')
 
-var scheduler = new Scheduler(db),
-    STATUS = {} // note this is in memory!
+var scheduler = new Scheduler(db)
 
-scheduler.on('service.external', (host, service) => {
-    var status_code = -1
-    waterfall([
-        (next) => executor(host, service, next),
-        (code, output, next) => {
-            status_code = code
-            perfparser(output, next)
-        },
-        (output, perfdata, next) => {
-            if (!STATUS[host.name]) 
-                STATUS[host.name] = {}
-            if (!STATUS[host.name][service.name])
-                STATUS[host.name][service.name] = {}
-
-            STATUS[host.name][service.name] = {
-                status: status_code,
-                output: output,
-                perfdata: perfdata || 'n/a'
-            }
-
-            logger.log(
-                'info',
-                `${host.name}-${service.name}: ${output}`
-            )
-
-            next(null)
-        }
-    ], (err) => {
-        if (err) logger.log('error', err)
-    })
-})
+// register external Executor
+require('./lib/external')(STATUS, db, logger, scheduler)
+// start web
+require('./lib/route')(STATUS, db, logger)
