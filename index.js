@@ -22,24 +22,11 @@ var config = require('./config/test'),
         config.db,
         { valueEncoding: 'json' }
     ),
-    Scheduler = require('./lib/Scheduler'),
-    winston = require('winston')
+    Scheduler = require('./lib/Scheduler')
 
-var logger = new winston.Logger({
-    emitErrs: true,
-    transports: [
-        new winston.transports.Console({
-            level:'info',
-            prettyPrint: false,
-            silent:false,
-            timestamp: true,
-            colorize: true,
-            json: false
-        })
-    ]
-})
-
-var scheduler = new Scheduler(db)
+// scheduler emits events when services need to run
+var scheduler = new Scheduler(db),
+    logger = require('./lib/logger')
 
 // register external Executor
 require('./lib/external')(STATUS, db, logger, scheduler)
