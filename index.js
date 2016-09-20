@@ -23,7 +23,21 @@ var config = require('./config/test'),
         { valueEncoding: 'json' }
     ),
     Scheduler = require('./lib/Scheduler'),
-    logger = require('winston')
+    winston = require('winston')
+
+var logger = new winston.Logger({
+    emitErrs: true,
+    transports: [
+        new winston.transports.Console({
+            level:'info',
+            prettyPrint: false,
+            silent:false,
+            timestamp: true,
+            colorize: true,
+            json: false
+        })
+    ]
+})
 
 var scheduler = new Scheduler(db)
 
