@@ -16,6 +16,8 @@
    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+require('./config/env') // set env
+
 var config = require('./config/test'),
     STATUS = {}, // note this is in memory!
     db = require('level')(

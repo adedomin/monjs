@@ -14,7 +14,7 @@
   ],
   "repository": "https://github.com/GeneralUnRest/ezios.git",
   "author": "Anthony DeDominic <anthony@dedominic.pw>",
-  "license": "GPLv3",
+  "license": "GPL-3.0+",
   "dependencies": {
     "async": "^2.0.1",
     "body-parser": "^1.15.2",
