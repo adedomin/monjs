@@ -26,13 +26,14 @@ var config = require('./config/test'),
 linvodb.dbPath = config.dbPath
 var Host = new linvodb('Host', require('./schema/host'), {}),
     Service = new linvodb('Service', require('./schema/service'), {}),
-    Auth = new linvodb('Auth', require('./schema/auth'), {})
+    Auth = new linvodb('Auth', require('./schema/auth'), {}),
+    TimeSeries = new linvodb('TimeSeries', require('./schema/time-series.js'), {})
 
 // scheduler emits events when services need to run
 var scheduler = new Scheduler(Host, Service),
     logger = require('./lib/logger')
 
 // register external Executor
-require('./lib/external')(STATUS, logger, scheduler)
+require('./lib/external')(STATUS, TimeSeries, logger, scheduler)
 // start web
 require('./lib/route')(STATUS, Host, Service, Auth, logger)
