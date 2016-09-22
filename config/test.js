@@ -1,6 +1,6 @@
 var config = {}
 
-config.db = './db/host-service.db'
+config.dbPath = './db/'
 
 config.http = {
     port: '9001',

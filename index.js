@@ -20,17 +20,19 @@ require('./config/env') // set env
 
 var config = require('./config/test'),
     STATUS = {}, // note this is in memory!
-    db = require('level')(
-        config.db,
-        { valueEncoding: 'json' }
-    ),
+    linvodb = require('linvodb3'),
     Scheduler = require('./lib/Scheduler')
 
+linvodb.dbPath = config.dbPath
+var Host = new linvodb('Host', require('./schema/host'), {}),
+    Service = new linvodb('Service', require('./schema/service'), {}),
+    Auth = new linvodb('Auth', require('./schema/auth'), {})
+
 // scheduler emits events when services need to run
-var scheduler = new Scheduler(db),
+var scheduler = new Scheduler(Host, Service),
     logger = require('./lib/logger')
 
 // register external Executor
-require('./lib/external')(STATUS, db, logger, scheduler)
+require('./lib/external')(STATUS, logger, scheduler)
 // start web
-require('./lib/route')(STATUS, db, logger)
+require('./lib/route')(STATUS, Host, Service, Auth, logger)
