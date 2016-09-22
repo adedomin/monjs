@@ -1,5 +1,7 @@
 var html = require('choo/html')
 
 module.exports = (state, prev, send) => html`
-    <h1>hi</h1>
+    <div class="jumbotron">
+        <h1>MonJS</h1>
+    </div>
 `
