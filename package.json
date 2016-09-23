@@ -19,13 +19,13 @@
     "async": "^2.0.1",
     "body-parser": "^1.15.2",
     "browserify": "^13.1.0",
+    "chart.js": "^2.3.0",
     "choo": "^3.3.0",
     "cookie-parser": "^1.4.3",
     "express": "^4.14.0",
     "leveldown": "^1.4.6",
     "linvodb3": "^3.25.0",
-    "winston": "^2.2.0",
-    "uglify-js": "git://github.com/mishoo/UglifyJS2#harmony"
-
+    "uglify-js": "git://github.com/mishoo/UglifyJS2#harmony",
+    "winston": "^2.2.0"
   }
 }
