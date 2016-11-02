@@ -5,8 +5,8 @@ var effects = require('../lib/effects'),
 module.exports = {
     state: {
         status: {},
-        hosts: {},
-        services: {},
+        hosts: [],
+        services: [],
         filterBy: '',
         banner: '',
         bannertype: 'info'

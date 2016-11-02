@@ -14,18 +14,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-var html = require('choo/html')
 
-module.exports = (state, send) => {
-    if (state.banner == '') return
-    return html`
-        <div class="alert alert-${state.bannertype} alert-dismissible fade in" role="alert">
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">X</span>
-            </button>
-            ${state.banner}
-        </div>
-    `
+module.exports = {
+    statusRefresh: (send, done) => {
+        send('updateStatus', null, done)
+        setInterval(() => {
+            send('updateStatus', null, done)
+        }, 30000)
+    }
 }
-
-
