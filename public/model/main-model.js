@@ -4,7 +4,7 @@ var effects = require('../lib/effects'),
 
 module.exports = {
     state: {
-        status: {},
+        status: [],
         hosts: [],
         services: [],
         filterBy: '',

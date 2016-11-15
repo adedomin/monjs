@@ -21,5 +21,17 @@ module.exports = {
         setInterval(() => {
             send('updateStatus', null, done)
         }, 30000)
+    },
+    hostRefresh: (send, done) => {
+        send('getHosts', null, done)
+        setInterval(() => {
+            send('getHosts', null, done)
+        }, 30000)
     }
+//    serviceRefresh: (send, done) => {
+//        send('getServices', null, done)
+//        setInterval(() => {
+//            send('getServices', null, done)
+//        }, 30000)
+//    }
 }

@@ -16,26 +16,25 @@
 
 
 var html = require('choo/html'),
-    navItems = [
-        'monjs',
-        'hosts',
-        'services'
-    ]
+    navItems = {
+        monjs: 'status',
+        hosts: 'host',
+        services: 'service'
+    }
 
-module.exports = (state, prev, send) => {
+module.exports = () => {
     var hash = window.location.hash.substring(1)
-    if (!hash || hash == '') hash = 'monjs'
+    if (!hash) hash = 'status'
     return html`
       <nav class="nav has-shadow">
         <div class="container">
           <div class="nav-left">
-            ${navItems.map((nav) => {
-                if (nav.indexOf(hash) > -1)
-                    return html`
-                        <a href="#${nav}" class="nav-item is-tab is-active">${nav}</a>
-                    `
+            ${Object.keys(navItems).map(nav => {
+                if (navItems[nav].indexOf(hash) > -1) return html`
+                    <a href="#${navItems[nav]}" class="nav-item is-tab is-active">${nav}</a>
+                `
                 return html`
-                    <a href="#${nav}" class="nav-item is-tab">${nav}</a>
+                    <a href="#${navItems[nav]}" class="nav-item is-tab">${nav}</a>
                 `
             })}
           </div>

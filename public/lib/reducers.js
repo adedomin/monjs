@@ -27,7 +27,7 @@ module.exports = {
     },
     errorBanner: (data, state) => {
         return Object.assign({}, state, { 
-            bannertype: 'error', banner: data
+            bannertype: 'danger', banner: data
         }) 
     },
     okBanner: (data, state) => {

@@ -19,16 +19,11 @@ var html = require('choo/html')
 module.exports = (state, send) => {
     if (state.banner == '') return
     return html`
-        <section class="hero is-${state.bannertype}">
-          <div class="hero-body">
-            <a class="button is-link is-pulled-right" onclick=${() => send('clearBanner')}>x</a>
-            <div class="container">
-              <h1 class="subtitle">
-                ${state.banner}
-              </h1>
-            </div>
-          </div>
-        </section>
+        <div class="notification is-${state.bannertype}">
+            <button class="delete" onclick=${() => send('clearBanner')}>
+            </button>
+            ${state.banner}
+        </div>
     `
 }
 

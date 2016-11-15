@@ -19,7 +19,6 @@
 // css
 require('../node_modules/bulma/css/bulma.css')
 
-// nothing yet
 var choo = require('choo'),
     app = choo()
 

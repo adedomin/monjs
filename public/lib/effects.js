@@ -15,27 +15,40 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-var http = require('choo/http')
+var http = require('choo/http'),
+    _ = require('lodash')
 
 module.exports = {
     updateStatus: (data, state, send, done) => {
         http('/api/v1/status', (err, res, body) => {
             if (err || res.statusCode != 200) 
-                return send('errorBanner', err || 'could not get status', done)
-            send('statusChange', body, done)
+                return send('errorBanner', 'Could not get status.', done)
+            body = JSON.parse(body)
+            var status = []
+            // transform status to an array for easier processing
+            _.keys(body).map(host => {
+                _.keys(body[host]).map(service => {
+                    body[host][service].service = service
+                    body[host][service].hostname = host
+                    status.push(body[host][service])
+                })
+            })
+            send('statusChange', status, done)
         })
     },
     getHosts: (data, state, send, done) => {
         http('/api/v1/host', (err, res, body) => {
             if (err || res.statusCode != 200) 
-                return send('errorBanner', err || 'could not get hosts', done)
+                return send('errorBanner', 'Could not get hosts.', done)
+            body = JSON.parse(body)
             send('hostChange', body, done)
         })
     },
     getServices: (data, state, send, done) => {
         http('/api/v1/service', (err, res, body) => {
             if (err || res.statusCode != 200)
-                return send('errorBanner', err || 'could not get services', done)
+                return send('errorBanner', 'Could not get services.', done)
+            body = JSON.parse(body)
             send('serviceChange', body, done)
         })
     },
