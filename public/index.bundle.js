@@ -21244,7 +21244,7 @@ module.exports = (state, prev, send) => html`
         </div>
 
         <div class="container">
-            <div class="columns is-multiline">
+            <div class="columns is-centered is-multiline">
                 ${state.status.map(stat => {
                     if (state.filterTarget == 'host' &&
                         stat.hostname.indexOf(state.filter) < 0) return 

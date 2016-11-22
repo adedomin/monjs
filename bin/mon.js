@@ -17,7 +17,18 @@
  */
 
 var stdio = require('stdio'),
-    request = require('request')
+    fs = require('fs'),
+    request = require('request'),
+    file = null
+
+var verbs = {
+    'add-host': (file, opts) => {},
+    'add-service': (file, opts) => {},
+    'get-host': (file, opts) => {},
+    'get-service': (file, opts) => {},
+    'del-host': (file, opts) => {},
+    'del-service': (file, opts) => {}
+}
 
 var opts = stdio.getopt({
     hostname: { key: 'H', args: 1, description: 'hostname' },
@@ -29,3 +40,24 @@ var opts = stdio.getopt({
     extras: { key: 'e', args: '*', description: 'extra host vars, key:value pairs, colon delimits key from value' },
     _meta_: { minArgs: 1 }
 })
+
+if (!verbs[opts.args[0]]) {
+    console.log`invalid verb
+    must be one of:
+        add-host 
+        add-service
+        get-host
+        get-service
+        del-host 
+        del-service
+    `
+}
+
+if (opts.args[1] && opts.args[1] == '-') {
+    file = process.stdin
+}
+else if (!opts.args[1] && fs.statSync(opts.args[1]).isFile()) {
+    file = fs.createReadstream(opts.args[1])
+}
+
+verbs[opts.args[0]](opts, file)
