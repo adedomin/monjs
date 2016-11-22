@@ -7,7 +7,9 @@ module.exports = {
         status: [],
         hosts: [],
         services: [],
-        filterBy: '',
+        filter: '',
+        filterTarget: 'host',
+        failFilter: false,
         banner: '',
         bannertype: 'info'
     },

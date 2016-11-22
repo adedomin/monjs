@@ -16,6 +16,15 @@
  */
 
 module.exports = {
+    filterChange: (data, state) => {
+        return Object.assign({}, state, { filter: data })
+    },
+    filterTargetChange: (data, state) => {
+        return Object.assign({}, state, { filterTarget: data })
+    },
+    failFilterChange: (data, state) => {
+        return Object.assign({}, state, { failFilter: data })
+    },
     statusChange: (data, state) => {
         return Object.assign({}, state, { status: data })
     },

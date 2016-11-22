@@ -56,12 +56,15 @@ module.exports = {
         http({
             method: 'put',
             body: JSON.stringify(data),
-            uri: `/api/v1/host/${data.host}/service`,
+            uri: '/api/v1/service',
             headers: {
                 'Content-Type': 'application/json'
             }
         }, (err, res, body) => {
-            if (err) return send('errorBanner', err)
+            if (err || !body || body.status == 'error') {
+                if (body && body.msg) err = body.msg
+                return send('errorBanner', err)
+            }
             send('okBanner', body.msg, done)
         })
     },
@@ -71,7 +74,10 @@ module.exports = {
             body: JSON.stringify(data),
             uri: '/api/v1/host'
         }, (err, res, body) => {
-            if (err) return send('errorBanner', err)
+            if (err || !body || body.status == 'error') {
+                if (body && body.msg) err = body.msg
+                return send('errorBanner', err)
+            }
             send('okBanner', body.msg, done)
         })
     }

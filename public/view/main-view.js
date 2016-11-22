@@ -13,7 +13,7 @@ module.exports = (state, prev, send) => html`
           <div class="hero-body">
             <div class="container">
               <h1 class="title">
-                MonJS
+                MonJS - Status Page
               </h1>
             </div>
           </div>
@@ -26,7 +26,7 @@ module.exports = (state, prev, send) => html`
                   <div class="heading">
                     <h1 class="title">Status</h1>
                     <h2 class="subtitle">${state.status.length}</p>
-                    <a href="#host" role="button">View details »</a>
+                    <button class="button is-link" onclick=${() => send('failFilterChange', false)}>View All »</a>
                   </div>
                 </div>
               </section>
@@ -39,7 +39,7 @@ module.exports = (state, prev, send) => html`
                     <h2 class="subtitle">
                         ${state.status.filter(stat => stat.status != 'OK').length}
                     </h2>
-                    <a href="#host?filter=error" role="button">View details »</a>
+                    <button class="button is-link" onclick=${() => send('failFilterChange', true)}>View Failing »</a>
                   </div>
                 </div>
               </section>
@@ -48,8 +48,31 @@ module.exports = (state, prev, send) => html`
         </div>
 
         <div class="container">
+            <p class="control has-addons">
+              <span class="select">
+                <select onchange=${(e) => send('filterTargetChange', e.target.value)}>
+                  <option value="host">host</option>
+                  <option value="service">service</option>
+                </select>
+              </span>
+              <input
+                type="text"
+                class="input is-expanded" 
+                hint="filter by hostname"
+                value="${state.filter}"
+                placeholder="Filter by ${state.filterTarget}"
+                oninput=${(e) => send('filterChange', e.target.value)}>
+            </p>
+        </div>
+
+        <div class="container">
             <div class="columns is-multiline">
                 ${state.status.map(stat => {
+                    if (state.filterTarget == 'host' &&
+                        stat.hostname.indexOf(state.filter) < 0) return 
+                    else if (state.filterTarget == 'service' &&
+                        stat.service.indexOf(state.filter) < 0) return 
+                    if (state.failFilter && stat.status == 'OK') return
                     return html`
                         <div class="column is-one-third">
                             ${card({

@@ -16,7 +16,10 @@
  */
 
 module.exports = {
-    name: String,
+    name: {
+        type: String,
+        index: true
+    },
     host: {
         type: String,
         index: true

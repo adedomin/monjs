@@ -20913,12 +20913,15 @@ module.exports = {
         http({
             method: 'put',
             body: JSON.stringify(data),
-            uri: `/api/v1/host/${data.host}/service`,
+            uri: '/api/v1/service',
             headers: {
                 'Content-Type': 'application/json'
             }
         }, (err, res, body) => {
-            if (err) return send('errorBanner', err)
+            if (err || !body || body.status == 'error') {
+                if (body && body.msg) err = body.msg
+                return send('errorBanner', err)
+            }
             send('okBanner', body.msg, done)
         })
     },
@@ -20928,7 +20931,10 @@ module.exports = {
             body: JSON.stringify(data),
             uri: '/api/v1/host'
         }, (err, res, body) => {
-            if (err) return send('errorBanner', err)
+            if (err || !body || body.status == 'error') {
+                if (body && body.msg) err = body.msg
+                return send('errorBanner', err)
+            }
             send('okBanner', body.msg, done)
         })
     }
@@ -20953,6 +20959,15 @@ module.exports = {
  */
 
 module.exports = {
+    filterChange: (data, state) => {
+        return Object.assign({}, state, { filter: data })
+    },
+    filterTargetChange: (data, state) => {
+        return Object.assign({}, state, { filterTarget: data })
+    },
+    failFilterChange: (data, state) => {
+        return Object.assign({}, state, { failFilter: data })
+    },
     statusChange: (data, state) => {
         return Object.assign({}, state, { status: data })
     },
@@ -20982,8 +20997,8 @@ module.exports = {
 },{}],44:[function(require,module,exports){
 module.exports = {
     OK: 'primary',
-    WARNING: 'warning',
-    CRITICAL: 'danger'
+    WARN: 'warning',
+    CRIT: 'danger'
 }
 
 },{}],45:[function(require,module,exports){
@@ -21016,13 +21031,13 @@ module.exports = {
         setInterval(() => {
             send('getHosts', null, done)
         }, 30000)
+    },
+    serviceRefresh: (send, done) => {
+        send('getServices', null, done)
+        setInterval(() => {
+            send('getServices', null, done)
+        }, 30000)
     }
-//    serviceRefresh: (send, done) => {
-//        send('getServices', null, done)
-//        setInterval(() => {
-//            send('getServices', null, done)
-//        }, 30000)
-//    }
 }
 
 },{}],46:[function(require,module,exports){
@@ -21035,7 +21050,9 @@ module.exports = {
         status: [],
         hosts: [],
         services: [],
-        filterBy: '',
+        filter: '',
+        filterTarget: 'host',
+        failFilter: false,
         banner: '',
         bannertype: 'info'
     },
@@ -21174,7 +21191,7 @@ module.exports = (state, prev, send) => html`
           <div class="hero-body">
             <div class="container">
               <h1 class="title">
-                MonJS
+                MonJS - Status Page
               </h1>
             </div>
           </div>
@@ -21187,7 +21204,7 @@ module.exports = (state, prev, send) => html`
                   <div class="heading">
                     <h1 class="title">Status</h1>
                     <h2 class="subtitle">${state.status.length}</p>
-                    <a href="#host" role="button">View details »</a>
+                    <button class="button is-link" onclick=${() => send('failFilterChange', false)}>View All »</a>
                   </div>
                 </div>
               </section>
@@ -21200,7 +21217,7 @@ module.exports = (state, prev, send) => html`
                     <h2 class="subtitle">
                         ${state.status.filter(stat => stat.status != 'OK').length}
                     </h2>
-                    <a href="#host?filter=error" role="button">View details »</a>
+                    <button class="button is-link" onclick=${() => send('failFilterChange', true)}>View Failing »</a>
                   </div>
                 </div>
               </section>
@@ -21209,8 +21226,31 @@ module.exports = (state, prev, send) => html`
         </div>
 
         <div class="container">
+            <p class="control has-addons">
+              <span class="select">
+                <select onchange=${(e) => send('filterTargetChange', e.target.value)}>
+                  <option value="host">host</option>
+                  <option value="service">service</option>
+                </select>
+              </span>
+              <input
+                type="text"
+                class="input is-expanded" 
+                hint="filter by hostname"
+                value="${state.filter}"
+                placeholder="Filter by ${state.filterTarget}"
+                oninput=${(e) => send('filterChange', e.target.value)}>
+            </p>
+        </div>
+
+        <div class="container">
             <div class="columns is-multiline">
                 ${state.status.map(stat => {
+                    if (state.filterTarget == 'host' &&
+                        stat.hostname.indexOf(state.filter) < 0) return 
+                    else if (state.filterTarget == 'service' &&
+                        stat.service.indexOf(state.filter) < 0) return 
+                    if (state.failFilter && stat.status == 'OK') return
                     return html`
                         <div class="column is-one-third">
                             ${card({
