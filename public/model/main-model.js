@@ -11,7 +11,9 @@ module.exports = {
         filterTarget: 'host',
         failFilter: false,
         banner: '',
-        bannertype: 'info'
+        bannertype: 'info',
+        modalActive: false,
+        modalForm: {}
     },
     effects: effects,
     reducers: reducers,

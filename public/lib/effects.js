@@ -55,29 +55,40 @@ module.exports = {
     addService: (data, state, send, done) => {
         http({
             method: 'put',
-            body: JSON.stringify(data),
+            body: JSON.stringify(state.modalForm),
             uri: '/api/v1/service',
             headers: {
                 'Content-Type': 'application/json'
             }
         }, (err, res, body) => {
-            if (err || !body || body.status == 'error') {
+            body = JSON.parse(body)
+            if (err || res.statusCode != 200 || !body || body.status == 'error') {
                 if (body && body.msg) err = body.msg
-                return send('errorBanner', err)
+                send('cancelModal', null, () => {})
+                return send('errorBanner', err, done)
             }
+            send('cancelModal', null, () => {})
+            send('getServices', null, () => {})
             send('okBanner', body.msg, done)
         })
     },
     addHost: (data, state, send, done) => {
         http({
             method: 'put',
-            body: JSON.stringify(data),
-            uri: '/api/v1/host'
-        }, (err, res, body) => {
-            if (err || !body || body.status == 'error') {
-                if (body && body.msg) err = body.msg
-                return send('errorBanner', err)
+            body: JSON.stringify(state.modalForm),
+            uri: '/api/v1/host',
+            headers: {
+                'Content-Type': 'application/json'
             }
+        }, (err, res, body) => {
+            body = JSON.parse(body)
+            if (err || res.statusCode != 200 || !body || body.status == 'error') {
+                if (body && body.msg) err = body.msg
+                send('cancelModal', null, () => {})
+                return send('errorBanner', err, done)
+            }
+            send('cancelModal', null, () => {})
+            send('getHosts', null, () => {})
             send('okBanner', body.msg, done)
         })
     }

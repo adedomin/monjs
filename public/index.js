@@ -24,13 +24,15 @@ var choo = require('choo'),
 
 app.model(require('./model/main-model'))
 
-app.router((route) => [
-    route('/', require('./view/main-view'))
-//    route('/host', require('./view/host-view')),
-//    route('/host/:host', require('./view/host-view')),
-//    route('/host/:host/:service', require('./view/service-view')),
-//    route('/service', require('./view/service-view'))
+app.router('/status', (route) => [
+    route('/status', require('./view/status-view')),
+    route('/host', require('./view/host-view'), [
+        route('/:hostname', require('./view/host-view'))
+    ]),
+    route('/service', require('./view/service-view'), [
+        route('/:service', require('./view/service-view'))
+    ])
 ])
 
-var tree = app.start()
+var tree = app.start({ hash: true })
 document.body.appendChild(tree)

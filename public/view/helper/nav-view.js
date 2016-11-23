@@ -17,24 +17,24 @@
 
 var html = require('choo/html'),
     navItems = {
-        monjs: 'status',
-        hosts: 'host',
-        services: 'service'
+        monjs: '#/status',
+        hosts: '#/host',
+        services: '#/service'
     }
 
 module.exports = () => {
-    var hash = window.location.hash.substring(1)
-    if (!hash) hash = 'status'
+    var hash = window.location.hash
+    if (!hash) hash = '#/status'
     return html`
       <nav class="nav has-shadow">
         <div class="container">
           <div class="nav-left">
             ${Object.keys(navItems).map(nav => {
                 if (navItems[nav].indexOf(hash) > -1) return html`
-                    <a href="#${navItems[nav]}" class="nav-item is-tab is-active">${nav}</a>
+                    <a href="/${navItems[nav]}" class="nav-item is-tab is-active">${nav}</a>
                 `
                 return html`
-                    <a href="#${navItems[nav]}" class="nav-item is-tab">${nav}</a>
+                    <a href="/${navItems[nav]}" class="nav-item is-tab">${nav}</a>
                 `
             })}
           </div>

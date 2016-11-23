@@ -16,6 +16,38 @@
  */
 
 module.exports = {
+    enableModal: (data, state) => {
+        return Object.assign({}, state, { 
+            modalForm: data,
+            modalActive: true
+        })
+    },
+    cancelModal: (data, state) => {
+        return Object.assign({}, state, { 
+            modalForm: {},
+            modalActive: false
+        })
+    },
+    modalFormChange: (data, state) => {
+        var newModal = Object.assign({}, state.modalForm, data)
+        return Object.assign({}, state, { modalForm: newModal })
+    },
+    modalFormExtraChange: (data, state) => {
+        var newModal = Object.assign({}, state.modalForm.extra_vars, data)
+        newModal = Object.assign({}, state.modalForm, { extra_vars: newModal })
+        return Object.assign({}, state, { modalForm: newModal })
+    },
+    modalExtraDelete: (data, state) => {
+        var newModal = Object.assign({}, state.modalForm, null)
+        delete newModal[data]
+        return Object.assign({}, state, { modalForm: newModal })
+    },
+    modalExtraAdd: (data, state) => {
+        var newModal = Object.assign({}, state.modalForm, null)
+        if (!newModal.extra_vars) newModal.extra_vars = {}
+        newModal.extra_vars[data] = ''
+        return Object.assign({}, state, { modalForm: newModal })
+    },
     filterChange: (data, state) => {
         return Object.assign({}, state, { filter: data })
     },

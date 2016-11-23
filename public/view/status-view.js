@@ -1,24 +1,16 @@
 var html = require('choo/html'),
-    banner = require('./banner-view'),
-    nav = require('./nav-view'),
-    card = require('./card-view'),
-    footer = require('./footer-view')
+    banner = require('./helper/banner-view'),
+    nav = require('./helper/nav-view'),
+    card = require('./helper/card-view'),
+    footer = require('./helper/footer-view'),
+    title = require('./helper/title-view')
 
 module.exports = (state, prev, send) => html`
     <div>
         ${banner(state, send)}
         ${nav()}
-
-        <section class="hero is-primary">
-          <div class="hero-body">
-            <div class="container">
-              <h1 class="title">
-                MonJS - Status Page
-              </h1>
-            </div>
-          </div>
-        </section>
-
+        ${title('Status')}
+    
         <div class="columns is-gapless has-text-centered">
             <div class="column">
               <section class="section">
@@ -81,7 +73,7 @@ module.exports = (state, prev, send) => html`
                                 subtitle: stat.service,
                                 body: stat.output,
                                 smallbody: stat.perfdata || 'no perfdata',
-                                link: [ 'nowhere', 'nowhere' ]
+                                link: [ '/nowhere', '/nowhere' ]
                             })}
                         </div>
                     `

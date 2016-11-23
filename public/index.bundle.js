@@ -20843,18 +20843,20 @@ var choo = require('choo'),
 
 app.model(require('./model/main-model'))
 
-app.router((route) => [
-    route('/', require('./view/main-view'))
-//    route('/host', require('./view/host-view')),
-//    route('/host/:host', require('./view/host-view')),
-//    route('/host/:host/:service', require('./view/service-view')),
-//    route('/service', require('./view/service-view'))
+app.router('/status', (route) => [
+    route('/status', require('./view/status-view')),
+    route('/host', require('./view/host-view'), [
+        route('/:hostname', require('./view/host-view'))
+    ]),
+    route('/service', require('./view/service-view'), [
+        route('/:service', require('./view/service-view'))
+    ])
 ])
 
-var tree = app.start()
+var tree = app.start({ hash: true })
 document.body.appendChild(tree)
 
-},{"../node_modules/bulma/css/bulma.css":7,"./model/main-model":46,"./view/main-view":50,"choo":10}],42:[function(require,module,exports){
+},{"../node_modules/bulma/css/bulma.css":7,"./model/main-model":46,"./view/host-view":52,"./view/service-view":53,"./view/status-view":54,"choo":10}],42:[function(require,module,exports){
 /*
  * Copyright (C) 2016 Anthony DeDominic <anthony@dedominic.pw>
  *
@@ -20912,29 +20914,40 @@ module.exports = {
     addService: (data, state, send, done) => {
         http({
             method: 'put',
-            body: JSON.stringify(data),
+            body: JSON.stringify(state.modalForm),
             uri: '/api/v1/service',
             headers: {
                 'Content-Type': 'application/json'
             }
         }, (err, res, body) => {
-            if (err || !body || body.status == 'error') {
+            body = JSON.parse(body)
+            if (err || res.statusCode != 200 || !body || body.status == 'error') {
                 if (body && body.msg) err = body.msg
-                return send('errorBanner', err)
+                send('cancelModal', null, () => {})
+                return send('errorBanner', err, done)
             }
+            send('cancelModal', null, () => {})
+            send('getServices', null, () => {})
             send('okBanner', body.msg, done)
         })
     },
     addHost: (data, state, send, done) => {
         http({
             method: 'put',
-            body: JSON.stringify(data),
-            uri: '/api/v1/host'
-        }, (err, res, body) => {
-            if (err || !body || body.status == 'error') {
-                if (body && body.msg) err = body.msg
-                return send('errorBanner', err)
+            body: JSON.stringify(state.modalForm),
+            uri: '/api/v1/host',
+            headers: {
+                'Content-Type': 'application/json'
             }
+        }, (err, res, body) => {
+            body = JSON.parse(body)
+            if (err || res.statusCode != 200 || !body || body.status == 'error') {
+                if (body && body.msg) err = body.msg
+                send('cancelModal', null, () => {})
+                return send('errorBanner', err, done)
+            }
+            send('cancelModal', null, () => {})
+            send('getHosts', null, () => {})
             send('okBanner', body.msg, done)
         })
     }
@@ -20959,6 +20972,38 @@ module.exports = {
  */
 
 module.exports = {
+    enableModal: (data, state) => {
+        return Object.assign({}, state, { 
+            modalForm: data,
+            modalActive: true
+        })
+    },
+    cancelModal: (data, state) => {
+        return Object.assign({}, state, { 
+            modalForm: {},
+            modalActive: false
+        })
+    },
+    modalFormChange: (data, state) => {
+        var newModal = Object.assign({}, state.modalForm, data)
+        return Object.assign({}, state, { modalForm: newModal })
+    },
+    modalFormExtraChange: (data, state) => {
+        var newModal = Object.assign({}, state.modalForm.extra_vars, data)
+        newModal = Object.assign({}, state.modalForm, { extra_vars: newModal })
+        return Object.assign({}, state, { modalForm: newModal })
+    },
+    modalExtraDelete: (data, state) => {
+        var newModal = Object.assign({}, state.modalForm, null)
+        delete newModal[data]
+        return Object.assign({}, state, { modalForm: newModal })
+    },
+    modalExtraAdd: (data, state) => {
+        var newModal = Object.assign({}, state.modalForm, null)
+        if (!newModal.extra_vars) newModal.extra_vars = {}
+        newModal.extra_vars[data] = ''
+        return Object.assign({}, state, { modalForm: newModal })
+    },
     filterChange: (data, state) => {
         return Object.assign({}, state, { filter: data })
     },
@@ -21054,7 +21099,9 @@ module.exports = {
         filterTarget: 'host',
         failFilter: false,
         banner: '',
-        bannertype: 'info'
+        bannertype: 'info',
+        modalActive: false,
+        modalForm: {}
     },
     effects: effects,
     reducers: reducers,
@@ -21112,7 +21159,7 @@ module.exports = (state, send) => {
  */
 
 var html = require('choo/html'),
-    status_colors = require('../lib/status-colors')
+    status_colors = require('../../lib/status-colors')
 
 module.exports = (data) => html`
   <div class="card is-fullwidth">
@@ -21131,13 +21178,13 @@ module.exports = (data) => html`
       </div>
     </div>
     <footer class="card-footer">
-      <a href="#${data.link[0]}" class="card-footer-item">goto host</a>
-      <a href="#${data.link[1]}" class="card-footer-item">goto service</a>
+      <a href="${data.link[0]}" class="card-footer-item">goto host</a>
+      <a href="${data.link[1]}" class="card-footer-item">goto service</a>
     </footer>
   </div>
 `
 
-},{"../lib/status-colors":44,"choo/html":8}],49:[function(require,module,exports){
+},{"../../lib/status-colors":44,"choo/html":8}],49:[function(require,module,exports){
 /*
  * Copyright 2016 prussian <genunrest@gmail.com>
  *
@@ -21176,27 +21223,260 @@ module.exports = () => {
 }
 
 },{"choo/html":8}],50:[function(require,module,exports){
+/*
+ * Copyright 2016 prussian <genunrest@gmail.com>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+
 var html = require('choo/html'),
-    banner = require('./banner-view'),
-    nav = require('./nav-view'),
-    card = require('./card-view'),
-    footer = require('./footer-view')
+    navItems = {
+        monjs: '#/status',
+        hosts: '#/host',
+        services: '#/service'
+    }
+
+module.exports = () => {
+    var hash = window.location.hash
+    if (!hash) hash = '#/status'
+    return html`
+      <nav class="nav has-shadow">
+        <div class="container">
+          <div class="nav-left">
+            ${Object.keys(navItems).map(nav => {
+                if (navItems[nav].indexOf(hash) > -1) return html`
+                    <a href="/${navItems[nav]}" class="nav-item is-tab is-active">${nav}</a>
+                `
+                return html`
+                    <a href="/${navItems[nav]}" class="nav-item is-tab">${nav}</a>
+                `
+            })}
+          </div>
+        </div>
+      </nav>
+    `
+}
+
+},{"choo/html":8}],51:[function(require,module,exports){
+var html = require('choo/html')
+
+module.exports = (title) => html`
+    <section class="hero is-primary">
+      <div class="hero-body">
+        <div class="container">
+          <h1 class="title">
+            MonJS - ${title}
+          </h1>
+        </div>
+      </div>
+    </section>
+`
+
+},{"choo/html":8}],52:[function(require,module,exports){
+var html = require('choo/html'),
+    banner = require('./helper/banner-view'),
+    nav = require('./helper/nav-view'),
+    footer = require('./helper/footer-view'),
+    title = require('./helper/title-view'),
+    _ = require('lodash')
+
+module.exports = (state, prev, send) => html`
+    <div>
+      ${banner(state, send)}
+      ${nav()}
+      ${title('Hosts')}
+
+      ${(() => { if (state.modalActive) 
+      return html`
+      <div class="modal is-active">
+        <div onclick=${() => send('cancelModal')} class="modal-background"></div>
+        <div class="modal-card">
+          <header class="modal-card-head">
+            <p class="modal-card-title">Edit host</p>
+            <button onclick=${() => send('cancelModal')} class="delete"></button>
+          </header>
+          <div class="modal-card-body">
+            <div class="section">
+              <div class="container">
+                <label class="label">Hostname</label>
+                <p class="control">
+                  <input
+                   class="input" 
+                   type="text" 
+                   value="${state.modalForm.name}"
+                   oninput=${(e) => send('modalFormChange', { name: e.target.value })}>
+                </p>
+                <label class="label">address</label>
+                <p class="control">
+                  <input
+                   class="input" 
+                   type="text" 
+                   value="${state.modalForm.address}"
+                   oninput=${(e) => send('modalFormChange', { address: e.target.value })}>
+                </p>
+                ${_.keys(state.modalForm.extra_vars).map((key) => html`
+                    <div>
+                    <label class="label">${key}</label>
+                    <p class="control has-addons">
+                      <input
+                       class="input is-expanded"
+                       type="text"
+                       value="${state.modalForm.extra_vars[key]}"
+                       oninput=${(e) => send('modalFormExtraChange', { [key]: e.target.value })}>
+                      <a onclick=${() => send('modalExtraDelete', key)} 
+                       class="button is-danger">
+                        <span class="icon">
+                          <i class="fa fa-times"></i>
+                        </span>
+                        <span>Delete</span>
+                      </a>
+                    </p>
+                    </div>
+                `)}
+                <label class="label">Add variable</label>
+                <p class="control has-addons">
+                  <input
+                   id="addextra"
+                   hint="add extra variable"
+                   class="input is-expanded"
+                   type="text">
+                  <a onclick=${() => send('modalExtraAdd', 
+                      document.getElementById('addextra').value
+                  )} class="button is-info">
+                    Add
+                  </a>
+                </p>
+              </div>
+            </div>
+            </div>
+            </div>
+          </div>
+          <footer class="modal-card-foot">
+            <a onclick=${() => send('addHost')} class="button is-success">
+              <span class="icon">
+                <i class="fa fa-check"></i>
+              </span>
+              <span>Save</span>
+            </a>
+            <a onclick=${() => send('cancelModal')} class="button">
+              Cancel
+            </a>
+          </footer>
+        </div>
+        </div>
+      </div>`})()}
+
+      <br>
+
+      <div class="container">
+        <div class="columns is-centered is-multiline">
+          ${state.hosts.map((host) => html`
+              <div class="column is-3">
+                <div class="box">
+                  <div class="content">
+                    <p>
+                      <strong>${host.name}</strong> <small>${host.address}</small>
+                    </p>
+                    <div class="control is-grouped">
+                    <p class="control">
+                      <a onclick=${() => send('enableModal', host)} class="button">
+                        Edit
+                      </a>
+                    </p>
+                    <p class="control">
+                      <a class="button is-danger">
+                        Delete
+                      </a>
+                    </p>
+                    </div>
+                  </div>      
+                </div>
+              </div>
+          `)}
+            <div class="column is-3">
+                <div class="box">
+                  <div class="content">
+                    <p>
+                      <strong>Add New Host</strong>
+                    </p>
+                    <p>
+                      <a 
+                       class="button is-info"
+                       onclick=${() => send('enableModal', 
+                           { 
+                               name: '', 
+                               address: '', 
+                               extra_vars: {} 
+                           })}>
+                        Add  
+                      </a>
+                    </p>
+                  </div>      
+                </div>
+              </div>
+
+        </div>
+      </div>
+
+      ${footer()}
+    </div>
+`
+
+},{"./helper/banner-view":47,"./helper/footer-view":49,"./helper/nav-view":50,"./helper/title-view":51,"choo/html":8,"lodash":19}],53:[function(require,module,exports){
+var html = require('choo/html'),
+    banner = require('./helper/banner-view'),
+    nav = require('./helper/nav-view'),
+    card = require('./helper/card-view'),
+    footer = require('./helper/footer-view'),
+    title = require('./helper/title-view')
+
+module.exports = (state, prev, send) => html`
+    <div>
+      ${banner(state, send)}
+      ${nav()}
+      ${title('Services')}
+
+      <div class="container">
+        <p class="control">
+          <input
+            type="text"
+            class="input" 
+            hint="filter by hostname"
+            value="${state.filter}"
+            placeholder="Filter by service"
+            oninput=${(e) => send('filterChange', e.target.value)}>
+        </p>
+      </div>
+
+      ${footer()}
+    </div>
+`
+
+},{"./helper/banner-view":47,"./helper/card-view":48,"./helper/footer-view":49,"./helper/nav-view":50,"./helper/title-view":51,"choo/html":8}],54:[function(require,module,exports){
+var html = require('choo/html'),
+    banner = require('./helper/banner-view'),
+    nav = require('./helper/nav-view'),
+    card = require('./helper/card-view'),
+    footer = require('./helper/footer-view'),
+    title = require('./helper/title-view')
 
 module.exports = (state, prev, send) => html`
     <div>
         ${banner(state, send)}
         ${nav()}
-
-        <section class="hero is-primary">
-          <div class="hero-body">
-            <div class="container">
-              <h1 class="title">
-                MonJS - Status Page
-              </h1>
-            </div>
-          </div>
-        </section>
-
+        ${title('Status')}
+    
         <div class="columns is-gapless has-text-centered">
             <div class="column">
               <section class="section">
@@ -21259,7 +21539,7 @@ module.exports = (state, prev, send) => html`
                                 subtitle: stat.service,
                                 body: stat.output,
                                 smallbody: stat.perfdata || 'no perfdata',
-                                link: [ 'nowhere', 'nowhere' ]
+                                link: [ '/nowhere', '/nowhere' ]
                             })}
                         </div>
                     `
@@ -21271,50 +21551,4 @@ module.exports = (state, prev, send) => html`
     </div>
 `
 
-},{"./banner-view":47,"./card-view":48,"./footer-view":49,"./nav-view":51,"choo/html":8}],51:[function(require,module,exports){
-/*
- * Copyright 2016 prussian <genunrest@gmail.com>
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-
-var html = require('choo/html'),
-    navItems = {
-        monjs: 'status',
-        hosts: 'host',
-        services: 'service'
-    }
-
-module.exports = () => {
-    var hash = window.location.hash.substring(1)
-    if (!hash) hash = 'status'
-    return html`
-      <nav class="nav has-shadow">
-        <div class="container">
-          <div class="nav-left">
-            ${Object.keys(navItems).map(nav => {
-                if (navItems[nav].indexOf(hash) > -1) return html`
-                    <a href="#${navItems[nav]}" class="nav-item is-tab is-active">${nav}</a>
-                `
-                return html`
-                    <a href="#${navItems[nav]}" class="nav-item is-tab">${nav}</a>
-                `
-            })}
-          </div>
-        </div>
-      </nav>
-    `
-}
-
-},{"choo/html":8}]},{},[41]);
+},{"./helper/banner-view":47,"./helper/card-view":48,"./helper/footer-view":49,"./helper/nav-view":50,"./helper/title-view":51,"choo/html":8}]},{},[41]);

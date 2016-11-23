@@ -16,7 +16,7 @@
  */
 
 var html = require('choo/html'),
-    status_colors = require('../lib/status-colors')
+    status_colors = require('../../lib/status-colors')
 
 module.exports = (data) => html`
   <div class="card is-fullwidth">
@@ -35,8 +35,8 @@ module.exports = (data) => html`
       </div>
     </div>
     <footer class="card-footer">
-      <a href="#${data.link[0]}" class="card-footer-item">goto host</a>
-      <a href="#${data.link[1]}" class="card-footer-item">goto service</a>
+      <a href="${data.link[0]}" class="card-footer-item">goto host</a>
+      <a href="${data.link[1]}" class="card-footer-item">goto service</a>
     </footer>
   </div>
 `
