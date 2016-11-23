@@ -20880,9 +20880,14 @@ var http = require('choo/http'),
 module.exports = {
     updateStatus: (data, state, send, done) => {
         http('/api/v1/status', (err, res, body) => {
-            if (err || res.statusCode != 200) 
+            try {
+                body = JSON.parse(body)
+            }
+            catch (e) {
+                body = null
+            }
+            if (err || res.statusCode != 200 || !body || body.status == 'error') 
                 return send('errorBanner', 'Could not get status.', done)
-            body = JSON.parse(body)
             var status = []
             // transform status to an array for easier processing
             _.keys(body).map(host => {
@@ -20897,58 +20902,89 @@ module.exports = {
     },
     getHosts: (data, state, send, done) => {
         http('/api/v1/host', (err, res, body) => {
-            if (err || res.statusCode != 200) 
+            try {
+                body = JSON.parse(body)
+            }
+            catch (e) {
+                body = null
+            }
+            if (err || res.statusCode != 200 || !body || body.status == 'error')
                 return send('errorBanner', 'Could not get hosts.', done)
-            body = JSON.parse(body)
+            
             send('hostChange', body, done)
         })
     },
     getServices: (data, state, send, done) => {
         http('/api/v1/service', (err, res, body) => {
-            if (err || res.statusCode != 200)
+            try {
+                body = JSON.parse(body)
+            }
+            catch (e) {
+                body = null
+            }
+            if (err || res.statusCode != 200 || !body || body.status == 'error') 
                 return send('errorBanner', 'Could not get services.', done)
-            body = JSON.parse(body)
+
             send('serviceChange', body, done)
         })
     },
-    addService: (data, state, send, done) => {
+    addObject: (data, state, send, done) => {
         http({
             method: 'put',
             body: JSON.stringify(state.modalForm),
-            uri: '/api/v1/service',
+            uri: `/api/v1/${data}`,
             headers: {
                 'Content-Type': 'application/json'
             }
         }, (err, res, body) => {
-            body = JSON.parse(body)
+            try {
+                body = JSON.parse(body)
+            }
+            catch (e) {
+                body = null
+            }
             if (err || res.statusCode != 200 || !body || body.status == 'error') {
                 if (body && body.msg) err = body.msg
-                send('cancelModal', null, () => {})
-                return send('errorBanner', err, done)
+                else err = `Could not add ${data}`
+                send('cancelModal', null, () => {
+                    send('errorBanner', err, done)
+                })
+                return
             }
-            send('cancelModal', null, () => {})
-            send('getServices', null, () => {})
-            send('okBanner', body.msg, done)
+            send('cancelModal', null, () => {
+                send('getHosts', null, () => {
+                    send('getServices', null, () => {
+                        send('okBanner', body.msg, done)
+                    })
+                })
+            })
         })
     },
-    addHost: (data, state, send, done) => {
+    delObject: (data, state, send, done) => {
         http({
-            method: 'put',
-            body: JSON.stringify(state.modalForm),
-            uri: '/api/v1/host',
-            headers: {
-                'Content-Type': 'application/json'
-            }
+            method: 'delete',
+            uri: `/api/v1/${data}`
         }, (err, res, body) => {
-            body = JSON.parse(body)
+            try {
+                body = JSON.parse(body)
+            }
+            catch (e) {
+                body = null
+            }
             if (err || res.statusCode != 200 || !body || body.status == 'error') {
                 if (body && body.msg) err = body.msg
-                send('cancelModal', null, () => {})
-                return send('errorBanner', err, done)
+                else err = `Could not delete ${data}`
+                send('cancelModal', null, () => { 
+                    send('errorBanner', err, done)
+                })
             }
-            send('cancelModal', null, () => {})
-            send('getHosts', null, () => {})
-            send('okBanner', body.msg, done)
+            send('cancelModal', null, () => {
+                send('getHosts', null, () => {
+                    send('getServices', null, () => {
+                        send('okBanner', body.msg, done)
+                    })
+                })
+            })
         })
     }
 }
@@ -21317,7 +21353,7 @@ module.exports = (state, prev, send) => html`
                    value="${state.modalForm.name}"
                    oninput=${(e) => send('modalFormChange', { name: e.target.value })}>
                 </p>
-                <label class="label">address</label>
+                <label class="label">Address</label>
                 <p class="control">
                   <input
                    class="input" 
@@ -21336,10 +21372,7 @@ module.exports = (state, prev, send) => html`
                        oninput=${(e) => send('modalFormExtraChange', { [key]: e.target.value })}>
                       <a onclick=${() => send('modalExtraDelete', key)} 
                        class="button is-danger">
-                        <span class="icon">
-                          <i class="fa fa-times"></i>
-                        </span>
-                        <span>Delete</span>
+                        Delete
                       </a>
                     </p>
                     </div>
@@ -21363,7 +21396,7 @@ module.exports = (state, prev, send) => html`
             </div>
           </div>
           <footer class="modal-card-foot">
-            <a onclick=${() => send('addHost')} class="button is-success">
+            <a onclick=${() => send('addObject', 'host')} class="button is-success">
               <span class="icon">
                 <i class="fa fa-check"></i>
               </span>
@@ -21395,7 +21428,8 @@ module.exports = (state, prev, send) => html`
                       </a>
                     </p>
                     <p class="control">
-                      <a class="button is-danger">
+                      <a onclick=${() => send('delObject', `host/${host.name}`) } 
+                       class="button is-danger">
                         Delete
                       </a>
                     </p>

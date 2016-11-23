@@ -31,7 +31,7 @@ module.exports = (state, prev, send) => html`
                    value="${state.modalForm.name}"
                    oninput=${(e) => send('modalFormChange', { name: e.target.value })}>
                 </p>
-                <label class="label">address</label>
+                <label class="label">Address</label>
                 <p class="control">
                   <input
                    class="input" 
@@ -50,10 +50,7 @@ module.exports = (state, prev, send) => html`
                        oninput=${(e) => send('modalFormExtraChange', { [key]: e.target.value })}>
                       <a onclick=${() => send('modalExtraDelete', key)} 
                        class="button is-danger">
-                        <span class="icon">
-                          <i class="fa fa-times"></i>
-                        </span>
-                        <span>Delete</span>
+                        Delete
                       </a>
                     </p>
                     </div>
@@ -77,7 +74,7 @@ module.exports = (state, prev, send) => html`
             </div>
           </div>
           <footer class="modal-card-foot">
-            <a onclick=${() => send('addHost')} class="button is-success">
+            <a onclick=${() => send('addObject', 'host')} class="button is-success">
               <span class="icon">
                 <i class="fa fa-check"></i>
               </span>
@@ -109,7 +106,8 @@ module.exports = (state, prev, send) => html`
                       </a>
                     </p>
                     <p class="control">
-                      <a class="button is-danger">
+                      <a onclick=${() => send('delObject', `host/${host.name}`) } 
+                       class="button is-danger">
                         Delete
                       </a>
                     </p>
