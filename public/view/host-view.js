@@ -47,7 +47,7 @@ module.exports = (state, prev, send) => html`
                        class="input is-expanded"
                        type="text"
                        value="${state.modalForm.extra_vars[key]}"
-                       oninput=${(e) => send('modalFormExtraChange', { [key]: e.target.value })}>
+                       oninput=${(e) => send('modalFormExtraChange', { [key]: e.target.value })}></input>
                       <a onclick=${() => send('modalExtraDelete', key)} 
                        class="button is-danger">
                         Delete

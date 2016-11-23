@@ -39,7 +39,7 @@ module.exports = {
     },
     modalExtraDelete: (data, state) => {
         var newModal = Object.assign({}, state.modalForm, null)
-        delete newModal[data]
+        delete newModal.extra_vars[data]
         return Object.assign({}, state, { modalForm: newModal })
     },
     modalExtraAdd: (data, state) => {
