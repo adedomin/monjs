@@ -16,7 +16,7 @@
  */
 
 module.exports = {
-    timestamp: {
+    date: {
         type: Date,
         index: true
     },

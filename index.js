@@ -22,10 +22,10 @@ var config = require('./config/test'),
     linvodb = require('linvodb3'),
     Scheduler = require('./lib/Scheduler'),
     Executor = require('./lib/executor'),
-//    Grapher = require('./lib/grapher'),
     perfparse = require('perfdata-parser'),
     router = require('./lib/route'),
-    each = require('async/each')
+    each = require('async/each'),
+    _ = require('lodash')
 
 linvodb.dbPath = config.dbPath
 var Host = new linvodb('Host', require('./schema/host'), {}),
@@ -38,7 +38,7 @@ var scheduler = new Scheduler(),
     executor = new Executor(),
     status = {},
     logger = require('./lib/logger'),
-    middleware = require('./lib/middleware')(status, Host, Service, Auth, logger)
+    middleware = require('./lib/middleware')(status, Host, Service, Auth, logger, TimeSeries)
 
 var status_codes = {
     0: 'OK',
@@ -59,8 +59,17 @@ executor.on('done', (err, code, output, hostname, servicename) => {
     var perfdata = perfparse(output)
     code = status_codes[code] || status_codes.unkn
 
-    //if (perfdata) 
-    //   grapher.add(hostname, servicename)
+    if (perfdata) {
+        _.keys(perfdata).map((key) => {
+            TimeSeries.insert({
+                date: new Date(),
+                service: servicename,
+                measure: key,
+                value: +perfdata[key].value || 0,
+                oum: perfdata[key].oum || ''
+            })
+        })
+    }
 
     if (!status[hostname]) status[hostname] = {}
     status[hostname][servicename] = {

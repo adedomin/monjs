@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-
 var html = require('choo/html'),
     navItems = {
         monjs: '#/status',

@@ -54,6 +54,9 @@ module.exports = {
     filterTargetChange: (data, state) => {
         return Object.assign({}, state, { filterTarget: data })
     },
+    filterSeriesChange: (data, state) => {
+        return Object.assign({}, state, { filterSeries: data })
+    },
     failFilterChange: (data, state) => {
         return Object.assign({}, state, { failFilter: data })
     },
@@ -65,6 +68,9 @@ module.exports = {
     },
     serviceChange: (data, state) => {
         return Object.assign({}, state, { services: data })
+    },
+    timeseriesChange: (data, state) => {
+        return Object.assign({}, state, { timeseries: data })
     },
     errorBanner: (data, state) => {
         return Object.assign({}, state, { 

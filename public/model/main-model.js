@@ -13,7 +13,9 @@ module.exports = {
         banner: '',
         bannertype: 'info',
         modalActive: false,
-        modalForm: {}
+        modalForm: {},
+        timeseries: [],
+        filterSeries: ''
     },
     effects: effects,
     reducers: reducers,

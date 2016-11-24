@@ -69,6 +69,23 @@ module.exports = {
             send('serviceChange', body, done)
         })
     },
+    getTimeSeries: (data, state, send, done) => {
+        http({
+            method: 'get',
+            uri: `/api/v1/metrics/${data.service}/${new Date(new Date().getTime() - data.since).toISOString()}`
+        }, (err, res, body) => {
+            try {
+                body = JSON.parse(body)
+            }
+            catch (e) {
+                body = null
+            }
+            if (err || res.statusCode != 200 || !body || body.status == 'error')
+                return send('errorBanner', 'Could not get timeseries', done)
+            
+            send('timeseriesChange', body, done)
+        })
+    },
     addObject: (data, state, send, done) => {
         http({
             method: 'put',
