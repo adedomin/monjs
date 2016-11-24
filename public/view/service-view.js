@@ -148,15 +148,20 @@ module.exports = (state, prev, send) => html`
                     <p>
                       <a 
                        class="button is-info"
-                       onclick=${() => send('enableModal', { 
-                           name: '', 
-                           host: '',
-                           command: '',
-                           argstring: '',
-                           args: [],
-                           time: 0,
-                           interval: 0 
-                       })}>
+                       onclick=${() => {
+                           var hostname = ''
+                           if (state.hosts[0] && state.hosts[0].name) 
+                               hostname = state.hosts[0].name
+                           send('enableModal', { 
+                               name: '', 
+                               host: hostname,
+                               command: '',
+                               argstring: '',
+                               args: [],
+                               time: 0,
+                               interval: 0 
+                           })
+                       }}>
                         Add  
                       </a>
                     </p>

@@ -37,7 +37,6 @@ var Host = new linvodb('Host', require('./schema/host'), {}),
 var scheduler = new Scheduler(),
     executor = new Executor(),
     status = {},
-//    grapher = new Grapher(TimeSeries),
     logger = require('./lib/logger'),
     middleware = require('./lib/middleware')(status, Host, Service, Auth, logger)
 
@@ -74,11 +73,12 @@ executor.on('done', (err, code, output, hostname, servicename) => {
 executor.on('error', (err, hostname, servicename) => {
     logger.log('info', err)
     if (hostname && servicename) {
-        this.emit('status_change', hostname, servicename, {
+        if (!status[hostname]) status[hostname] = {}
+        status[hostname][servicename] = {
             status: status_codes.unkn,
             output: err,
             perfdata: undefined
-        })
+        }
     }
 })
 
