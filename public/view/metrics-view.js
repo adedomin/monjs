@@ -29,18 +29,13 @@ module.exports = (state, prev, send) => html`
       ${nav()}
       ${title(`Metrics - ${state.params.service}`)}
       
-      <div class="columns is-gapless">
-        <div class="column">
           <section class="section">
-            <div class="container">
+            <div class="container is-clearfix">
+              <div class="is-pulled-left">
               <label class="label">Time Since</label>
               <p class="control">
                 <span class="select">
-                  <select id="timeseries-select"
-                   oninput=${(e) => send('getTimeSeries', { 
-                       since: +e.target.value, 
-                       service: encodeURIComponent(state.params.service)
-                   })}>
+                  <select id="timeseries-select">
                     <option value="3600000">
                       hour
                     </option>
@@ -67,17 +62,22 @@ module.exports = (state, prev, send) => html`
                   `)}  
                 </select>
               </p>
-            </div>
-          </section>
-        </div>
-        <div class="column">
-          <section class="section">
-            <div class="container">
+              <br>
+              <p class="control">
+                <a class="button is-info"
+                   onclick=${() => send('getTimeSeries', { 
+                       since: +document.getElementById('timeseries-select').value,
+                       service: encodeURIComponent(state.params.service)
+                   })}>
+                  Get timeseries
+                </a>
+              </p>
+              </div>
+              <div class="is-pulled-right">
               ${graph(state.timeseries, state.filterSeries)}
+              </div>
             </div>
           </section>
-        </div>
-      </div>
 
       ${footer()}
     </div>

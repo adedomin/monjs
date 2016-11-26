@@ -35,7 +35,7 @@ module.exports = (state, prev, send) => html`
                   <div class="heading">
                     <h1 class="title">Status</h1>
                     <h2 class="subtitle">${state.status.length}</p>
-                    <button class="button is-link" onclick=${() => send('failFilterChange', false)}>View All »</a>
+                    <a class="button is-link" onclick=${() => send('failFilterChange', false)}>View All »</a>
                   </div>
                 </div>
               </section>
@@ -48,7 +48,7 @@ module.exports = (state, prev, send) => html`
                     <h2 class="subtitle">
                         ${state.status.filter(stat => stat.status != 'OK').length}
                     </h2>
-                    <button class="button is-link" onclick=${() => send('failFilterChange', true)}>View Failing »</a>
+                    <a class="button is-link" onclick=${() => send('failFilterChange', true)}>View Failing »</a>
                   </div>
                 </div>
               </section>

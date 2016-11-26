@@ -17,10 +17,8 @@
   "license": "GPL-3.0+",
   "dependencies": {
     "async": "^2.0.1",
-    "bel": "^4.5.0",
     "body-parser": "^1.15.2",
     "bulma": "^0.2.3",
-    "cache-element": "^1.1.1",
     "choo": "^3.3.0",
     "cookie-parser": "^1.4.3",
     "express": "^4.14.0",

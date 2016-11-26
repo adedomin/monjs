@@ -15,44 +15,36 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-var widget = require('cache-element/widget'),
-    html = require('choo/html'),
-    MG = require('metrics-graphics')
+var MG = require('metrics-graphics')
 
-module.exports = widget((update) => {
-    var timedata = null
-    update(onupdate)
+var graph = (timedata, filter) => {
+    
+    var el = document.createElement('div')
+    MG.data_graphic({
+        title: filter,
+        data: timedata,
+        width: 600,
+        height: 400,
+        missing_is_zero: true,
+        utc_time: true,
+        target: el,
+        x_accessor: 'date',
+        y_accessor: 'value'
+    })
 
-    return html`
-        <div class="is-centered" id="perfdata-graph">
-            <div onload=${onload} onunload=${onunload}></div>
-        </div>
-    `
+    return el
+}
 
-    function onupdate (_timedata, filter) {
-        timedata = _timedata
-                    .filter((data) => data.measure == filter)
-                    .map((data) => {
-                        data.date = new Date(data.date)
-                        return data
-                    })
-    }
+var createEl = (_timedata, filter) => {
 
-    function onload () {
-        MG.data_graphic({
-            title: 'perfdata',
-            data: timedata,
-            width: 600,
-            height: 400,
-            missing_is_zero: true,
-            utc_time: true,
-            target: document.getElementById('perfdata-graph'),
-            x_accessor: 'date',
-            y_accessor: 'value'
-        })
-    }
+    var timedata = _timedata
+     .filter((data) => data.measure.indexOf(filter) > -1)
+     .map((data) => {
+         data.date = new Date(data.date)
+         return data
+     })
 
-    function onunload () {
-        timedata = null
-    }
-})
+    return graph(timedata, filter)
+}
+
+module.exports = createEl
