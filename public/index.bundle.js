@@ -45310,7 +45310,7 @@ app.router('/status', (route) => [
 var tree = app.start({ hash: true })
 document.body.appendChild(tree)
 
-},{"../node_modules/bulma/css/bulma.css":7,"./model/main-model":48,"./view/host-view":55,"./view/metrics-view":56,"./view/service-view":57,"./view/status-view":58,"choo":10}],44:[function(require,module,exports){
+},{"../node_modules/bulma/css/bulma.css":7,"./model/main-model":48,"./view/host-view":56,"./view/metrics-view":57,"./view/service-view":58,"./view/status-view":59,"choo":10}],44:[function(require,module,exports){
 /*
  * Copyright (C) 2016 Anthony DeDominic <anthony@dedominic.pw>
  *
@@ -45333,7 +45333,10 @@ var http = require('choo/http'),
 
 module.exports = {
     updateStatus: (data, state, send, done) => {
-        http('/api/v1/status', (err, res, body) => {
+        http({
+            uri: '/api/v1/status',
+            withCredentials: true
+        }, (err, res, body) => {
             try {
                 body = JSON.parse(body)
             }
@@ -45355,7 +45358,10 @@ module.exports = {
         })
     },
     getHosts: (data, state, send, done) => {
-        http('/api/v1/host', (err, res, body) => {
+        http({ 
+            uri: '/api/v1/host',
+            withCredentials: true
+        }, (err, res, body) => {
             try {
                 body = JSON.parse(body)
             }
@@ -45369,7 +45375,10 @@ module.exports = {
         })
     },
     getServices: (data, state, send, done) => {
-        http('/api/v1/service', (err, res, body) => {
+        http({
+            uri: '/api/v1/service', 
+            withCredentials: true
+        }, (err, res, body) => {
             try {
                 body = JSON.parse(body)
             }
@@ -45383,11 +45392,10 @@ module.exports = {
         })
     },
     getTimeSeries: (data, state, send, done) => {
-        console.log(`/api/v1/metrics/${data.service}/${new Date(new Date().getTime() - data.since).toISOString()}`)
-
         http({
             method: 'get',
-            uri: `/api/v1/metrics/${data.service}/${new Date(new Date().getTime() - data.since).toISOString()}`
+            uri: `/api/v1/metrics/${data.service}/${new Date(new Date().getTime() - data.since).toISOString()}`,
+            withCredentials: true
         }, (err, res, body) => {
             try {
                 body = JSON.parse(body)
@@ -45408,7 +45416,8 @@ module.exports = {
             uri: `/api/v1/${data}`,
             headers: {
                 'Content-Type': 'application/json'
-            }
+            },
+            withCredentials: true
         }, (err, res, body) => {
             try {
                 body = JSON.parse(body)
@@ -45436,7 +45445,8 @@ module.exports = {
     delObject: (data, state, send, done) => {
         http({
             method: 'delete',
-            uri: `/api/v1/${data}`
+            uri: `/api/v1/${data}`,
+            withCredentials: true
         }, (err, res, body) => {
             try {
                 body = JSON.parse(body)
@@ -45455,6 +45465,34 @@ module.exports = {
                 send('getHosts', null, () => {
                     send('getServices', null, () => {
                         send('okBanner', body.msg, done)
+                    })
+                })
+            })
+        })
+    },
+    testAuth: (data, state, send, done) => {
+        http({
+            uri: '/api/v1/auth',
+            headers: {
+                'api-key': data
+            },
+            withCredentials: true
+        }, (err, res, body) => {
+            try {
+                body = JSON.parse(body)
+            }
+            catch (e) {
+                body = null
+            }
+            if (err || res.statusCode != 200 || !body || body.status == 'error') 
+                return send('authChange', false, done)
+
+            send('authChange', true, () => {
+                send('clearBanner', body.msg, () => {
+                    send('getHosts', null, () => {
+                        send('getServices', null, () => {
+                            send('updateStatus', null, done)
+                        })
                     })
                 })
             })
@@ -45551,6 +45589,11 @@ module.exports = {
         return Object.assign({}, state, {
             bannertype: 'info', banner: ''
         })
+    },
+    authChange: (data, state) => {
+        return Object.assign({}, state, {
+            auth: data
+        })
     }
 }
 
@@ -45580,6 +45623,12 @@ module.exports = {
  */
 
 module.exports = {
+    authRefresh: (send, done) => {
+        send('testAuth', '', done)
+        setInterval(() => {
+            send('testAuth', '', done)
+        }, 30000)
+    },
     statusRefresh: (send, done) => {
         send('updateStatus', null, done)
         setInterval(() => {
@@ -45618,7 +45667,8 @@ module.exports = {
         modalActive: false,
         modalForm: {},
         timeseries: [],
-        filterSeries: ''
+        filterSeries: '',
+        auth: true
     },
     effects: effects,
     reducers: reducers,
@@ -45793,6 +45843,29 @@ module.exports = () => {
 }
 
 },{"choo/html":8}],53:[function(require,module,exports){
+var html = require('choo/html')
+
+module.exports = (state, send) => {
+    if (!state.auth) return html`
+      <div class="modal is-active">
+        <div class="modal-background"></div>
+        <div class="modal-content">
+          <div class="box">
+            <p class="control has-addons">
+              <input class="input is-expanded" id="secret"
+                     type="password">
+              <a class="button is-info"
+                 onclick=${() => send('testAuth', document.getElementById('secret').value)}>
+                Login
+              </a>
+            </p>
+          </div>
+        </div>
+      </div>
+    `
+}
+
+},{"choo/html":8}],54:[function(require,module,exports){
 /*
  * Copyright 2016 prussian <genunrest@gmail.com>
  *
@@ -45837,7 +45910,7 @@ module.exports = () => {
     `
 }
 
-},{"choo/html":8}],54:[function(require,module,exports){
+},{"choo/html":8}],55:[function(require,module,exports){
 var html = require('choo/html')
 
 module.exports = (title) => html`
@@ -45852,7 +45925,7 @@ module.exports = (title) => html`
     </section>
 `
 
-},{"choo/html":8}],55:[function(require,module,exports){
+},{"choo/html":8}],56:[function(require,module,exports){
 /*
  * Copyright (C) 2016  prussian <genunrest@gmail.com>
  *
@@ -45875,6 +45948,7 @@ var html = require('choo/html'),
     nav = require('./helper/nav-view'),
     footer = require('./helper/footer-view'),
     title = require('./helper/title-view'),
+    login = require('./helper/login-view'),
     _ = require('lodash')
 
 module.exports = (state, prev, send) => html`
@@ -45882,6 +45956,7 @@ module.exports = (state, prev, send) => html`
       ${banner(state, send)}
       ${nav()}
       ${title('Hosts')}
+      ${login(state, send)}
 
       ${(() => { if (state.modalActive) 
       return html`
@@ -46017,7 +46092,7 @@ module.exports = (state, prev, send) => html`
     </div>
 `
 
-},{"./helper/banner-view":49,"./helper/footer-view":52,"./helper/nav-view":53,"./helper/title-view":54,"choo/html":8,"lodash":20}],56:[function(require,module,exports){
+},{"./helper/banner-view":49,"./helper/footer-view":52,"./helper/login-view":53,"./helper/nav-view":54,"./helper/title-view":55,"choo/html":8,"lodash":20}],57:[function(require,module,exports){
 /*
  * Copyright (C) 2016  prussian <genunrest@gmail.com>
  *
@@ -46041,6 +46116,7 @@ var html = require('choo/html'),
     nav = require('./helper/nav-view'),
     footer = require('./helper/footer-view'),
     title = require('./helper/title-view'),
+    login = require('./helper/login-view'),
     _ = require('lodash')
 
 module.exports = (state, prev, send) => html`
@@ -46048,6 +46124,7 @@ module.exports = (state, prev, send) => html`
       ${banner(state, send)}
       ${nav()}
       ${title(`Metrics - ${state.params.service}`)}
+      ${login(state, send)}
       
           <section class="section">
             <div class="container is-clearfix">
@@ -46103,7 +46180,7 @@ module.exports = (state, prev, send) => html`
     </div>
 `
 
-},{"./helper/banner-view":49,"./helper/chart-view":51,"./helper/footer-view":52,"./helper/nav-view":53,"./helper/title-view":54,"choo/html":8,"lodash":20}],57:[function(require,module,exports){
+},{"./helper/banner-view":49,"./helper/chart-view":51,"./helper/footer-view":52,"./helper/login-view":53,"./helper/nav-view":54,"./helper/title-view":55,"choo/html":8,"lodash":20}],58:[function(require,module,exports){
 /*
  * Copyright (C) 2016  prussian <genunrest@gmail.com>
  *
@@ -46125,13 +46202,15 @@ var html = require('choo/html'),
     banner = require('./helper/banner-view'),
     nav = require('./helper/nav-view'),
     footer = require('./helper/footer-view'),
-    title = require('./helper/title-view')
+    title = require('./helper/title-view'),
+    login = require('./helper/login-view')
 
 module.exports = (state, prev, send) => html`
     <div>
       ${banner(state, send)}
       ${nav()}
       ${title('Services')}
+      ${login(state, send)}
 
       ${(() => { if (state.modalActive) return html`
       <div class="modal is-active">
@@ -46298,7 +46377,7 @@ module.exports = (state, prev, send) => html`
     </div>
 `
 
-},{"./helper/banner-view":49,"./helper/footer-view":52,"./helper/nav-view":53,"./helper/title-view":54,"choo/html":8}],58:[function(require,module,exports){
+},{"./helper/banner-view":49,"./helper/footer-view":52,"./helper/login-view":53,"./helper/nav-view":54,"./helper/title-view":55,"choo/html":8}],59:[function(require,module,exports){
 /*
  * Copyright (C) 2016  prussian <genunrest@gmail.com>
  *
@@ -46321,13 +46400,15 @@ var html = require('choo/html'),
     nav = require('./helper/nav-view'),
     card = require('./helper/card-view'),
     footer = require('./helper/footer-view'),
-    title = require('./helper/title-view')
+    title = require('./helper/title-view'),
+    login = require('./helper/login-view')
 
 module.exports = (state, prev, send) => html`
     <div>
         ${banner(state, send)}
         ${nav()}
         ${title('Status')}
+        ${login(state, send)}
     
         <div class="columns is-gapless has-text-centered">
             <div class="column">
@@ -46403,4 +46484,4 @@ module.exports = (state, prev, send) => html`
     </div>
 `
 
-},{"./helper/banner-view":49,"./helper/card-view":50,"./helper/footer-view":52,"./helper/nav-view":53,"./helper/title-view":54,"choo/html":8}]},{},[43]);
+},{"./helper/banner-view":49,"./helper/card-view":50,"./helper/footer-view":52,"./helper/login-view":53,"./helper/nav-view":54,"./helper/title-view":55,"choo/html":8}]},{},[43]);

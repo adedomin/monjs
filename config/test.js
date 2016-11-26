@@ -5,7 +5,7 @@ config.dbPath = './db/'
 config.http = {
     port: '9001',
     addr: null, // null = all
-    auth: false
+    auth: true
 }
 
 config.logger = {

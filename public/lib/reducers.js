@@ -86,5 +86,10 @@ module.exports = {
         return Object.assign({}, state, {
             bannertype: 'info', banner: ''
         })
+    },
+    authChange: (data, state) => {
+        return Object.assign({}, state, {
+            auth: data
+        })
     }
 }

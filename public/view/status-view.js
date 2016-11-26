@@ -20,13 +20,15 @@ var html = require('choo/html'),
     nav = require('./helper/nav-view'),
     card = require('./helper/card-view'),
     footer = require('./helper/footer-view'),
-    title = require('./helper/title-view')
+    title = require('./helper/title-view'),
+    login = require('./helper/login-view')
 
 module.exports = (state, prev, send) => html`
     <div>
         ${banner(state, send)}
         ${nav()}
         ${title('Status')}
+        ${login(state, send)}
     
         <div class="columns is-gapless has-text-centered">
             <div class="column">

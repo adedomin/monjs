@@ -15,7 +15,8 @@ module.exports = {
         modalActive: false,
         modalForm: {},
         timeseries: [],
-        filterSeries: ''
+        filterSeries: '',
+        auth: true
     },
     effects: effects,
     reducers: reducers,

@@ -16,6 +16,12 @@
  */
 
 module.exports = {
+    authRefresh: (send, done) => {
+        send('testAuth', '', done)
+        setInterval(() => {
+            send('testAuth', '', done)
+        }, 30000)
+    },
     statusRefresh: (send, done) => {
         send('updateStatus', null, done)
         setInterval(() => {

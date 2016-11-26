@@ -19,13 +19,15 @@ var html = require('choo/html'),
     banner = require('./helper/banner-view'),
     nav = require('./helper/nav-view'),
     footer = require('./helper/footer-view'),
-    title = require('./helper/title-view')
+    title = require('./helper/title-view'),
+    login = require('./helper/login-view')
 
 module.exports = (state, prev, send) => html`
     <div>
       ${banner(state, send)}
       ${nav()}
       ${title('Services')}
+      ${login(state, send)}
 
       ${(() => { if (state.modalActive) return html`
       <div class="modal is-active">

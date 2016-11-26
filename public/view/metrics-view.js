@@ -21,6 +21,7 @@ var html = require('choo/html'),
     nav = require('./helper/nav-view'),
     footer = require('./helper/footer-view'),
     title = require('./helper/title-view'),
+    login = require('./helper/login-view'),
     _ = require('lodash')
 
 module.exports = (state, prev, send) => html`
@@ -28,6 +29,7 @@ module.exports = (state, prev, send) => html`
       ${banner(state, send)}
       ${nav()}
       ${title(`Metrics - ${state.params.service}`)}
+      ${login(state, send)}
       
           <section class="section">
             <div class="container is-clearfix">

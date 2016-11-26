@@ -20,7 +20,10 @@ var http = require('choo/http'),
 
 module.exports = {
     updateStatus: (data, state, send, done) => {
-        http('/api/v1/status', (err, res, body) => {
+        http({
+            uri: '/api/v1/status',
+            withCredentials: true
+        }, (err, res, body) => {
             try {
                 body = JSON.parse(body)
             }
@@ -42,7 +45,10 @@ module.exports = {
         })
     },
     getHosts: (data, state, send, done) => {
-        http('/api/v1/host', (err, res, body) => {
+        http({ 
+            uri: '/api/v1/host',
+            withCredentials: true
+        }, (err, res, body) => {
             try {
                 body = JSON.parse(body)
             }
@@ -56,7 +62,10 @@ module.exports = {
         })
     },
     getServices: (data, state, send, done) => {
-        http('/api/v1/service', (err, res, body) => {
+        http({
+            uri: '/api/v1/service', 
+            withCredentials: true
+        }, (err, res, body) => {
             try {
                 body = JSON.parse(body)
             }
@@ -70,11 +79,10 @@ module.exports = {
         })
     },
     getTimeSeries: (data, state, send, done) => {
-        console.log(`/api/v1/metrics/${data.service}/${new Date(new Date().getTime() - data.since).toISOString()}`)
-
         http({
             method: 'get',
-            uri: `/api/v1/metrics/${data.service}/${new Date(new Date().getTime() - data.since).toISOString()}`
+            uri: `/api/v1/metrics/${data.service}/${new Date(new Date().getTime() - data.since).toISOString()}`,
+            withCredentials: true
         }, (err, res, body) => {
             try {
                 body = JSON.parse(body)
@@ -95,7 +103,8 @@ module.exports = {
             uri: `/api/v1/${data}`,
             headers: {
                 'Content-Type': 'application/json'
-            }
+            },
+            withCredentials: true
         }, (err, res, body) => {
             try {
                 body = JSON.parse(body)
@@ -123,7 +132,8 @@ module.exports = {
     delObject: (data, state, send, done) => {
         http({
             method: 'delete',
-            uri: `/api/v1/${data}`
+            uri: `/api/v1/${data}`,
+            withCredentials: true
         }, (err, res, body) => {
             try {
                 body = JSON.parse(body)
@@ -142,6 +152,34 @@ module.exports = {
                 send('getHosts', null, () => {
                     send('getServices', null, () => {
                         send('okBanner', body.msg, done)
+                    })
+                })
+            })
+        })
+    },
+    testAuth: (data, state, send, done) => {
+        http({
+            uri: '/api/v1/auth',
+            headers: {
+                'api-key': data
+            },
+            withCredentials: true
+        }, (err, res, body) => {
+            try {
+                body = JSON.parse(body)
+            }
+            catch (e) {
+                body = null
+            }
+            if (err || res.statusCode != 200 || !body || body.status == 'error') 
+                return send('authChange', false, done)
+
+            send('authChange', true, () => {
+                send('clearBanner', body.msg, () => {
+                    send('getHosts', null, () => {
+                        send('getServices', null, () => {
+                            send('updateStatus', null, done)
+                        })
                     })
                 })
             })
