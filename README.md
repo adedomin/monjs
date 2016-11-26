@@ -43,3 +43,24 @@ To access them, use \$VAR\$ or \$\_VAR\$ for extra_vars:
     $NAME$          - is replaced by the host's alias name
     $ADDRESS$       - is replaced by the address of the host
     $_SERVICE_PASS$ - gets the service_pass variable in extra_vars
+
+Services
+--------
+
+Services should Ideally be nagios compatible commands.
+Like hosts, they have an alias which is denoted by name.
+A service must be associated with only one, sigular host (future versions may allow for grouping common hosts).
+The service must also have a command; the command is justa path to a executable on the server or a command which can be found in monjs's configured process.env.PATH (see the config file).
+Interval is the frequency, in miliseconds, the command is executed.
+
+In the web ui, args is just a string which is automatically split into an array.
+quoted strings will be converted to a singular argument.
+As stated in the Hosts section, you can access host variables using the \$VAR\$ or \$\_VAR\$ syntax.
+
+TODO
+----
+
+  * Metrics - Still not working as expected.
+  * recheck services prematurely.
+  * full-featured command line client.
+  * better todo, logo, pictures, etc.
