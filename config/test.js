@@ -23,4 +23,8 @@ config.env = {
     API_KEY: 'a secret =]'
 }
 
+for (var key in config.env) {
+    process.env[key] = config.env[key]
+}
+
 module.exports = config

@@ -1,0 +1,70 @@
+#!/usr/bin/env bash
+# Copyright (C) 2016  prussian <genunrest@gmail.com>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+__DIRNAME=$(dirname $0)
+VERB=$1
+shift
+
+while [ $# -gt 0 ]; do
+    case "$1" in
+        -H|--hostname)
+            shift
+            HOST=$1
+            ;;
+        -a|--address)
+            shift
+            ADDRESS=$1
+            ;;
+        -e|--extra)
+            shift
+            EXTRA=$1
+            ;;
+        -s|--service)
+            SERVICE=$1
+            ;;
+        -c|--command)
+            shift
+            COMMAND=$1
+            ;;
+        -A|--args)
+            shift
+            ARGS=$1
+            ;;
+        -i|--interval)
+            shift
+            INTERVAL=$1
+            ;;
+    esac
+    shift
+done
+
+if [ "$VERB" = 'init' ]; then
+    if [ -n "$XDG_CONFIG_HOME" ]; then
+        cp "$__DIRNAME/../config/test.js" "$XDG_CONFIG_HOME/mon.js" || ( echo "failed to write config"; exit 1)
+        echo "Configurations written to $XDG_CONFIG_HOME/mon.js"
+    else
+        cp "$__DIRNAME/../config/test.js" "$HOME/.mon.js" || ( echo "failed to write config "; exit 1)
+        echo "Configurations written to $HOME/.mon.js"
+    fi
+
+    echo "Please make sure to change the default secret key"
+    echo "Also it is recommended to set the PATH var in the config to point to your nagios compatible test scripts"
+    exit 0
+fi
+
+if [ "$VERB" = 'start' ]; then
+    /usr/bin/env node "$__DIRNAME/../index.js"
+fi
