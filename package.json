@@ -1,5 +1,5 @@
 {
-  "name": "monjs",
+  "name": "ezios",
   "version": "0.0.1",
   "description": "nagios, but more dynamic",
   "main": "index.js",
@@ -13,7 +13,8 @@
   },
   "keywords": [
     "monitoring",
-    "nagios"
+    "nagios",
+    "monjs"
   ],
   "repository": "https://github.com/GeneralUnRest/ezios.git",
   "author": "Anthony DeDominic <anthony@dedominic.pw>",
