@@ -45383,6 +45383,8 @@ module.exports = {
         })
     },
     getTimeSeries: (data, state, send, done) => {
+        console.log(`/api/v1/metrics/${data.service}/${new Date(new Date().getTime() - data.since).toISOString()}`)
+
         http({
             method: 'get',
             uri: `/api/v1/metrics/${data.service}/${new Date(new Date().getTime() - data.since).toISOString()}`
