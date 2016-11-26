@@ -16,7 +16,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-// find config
 var find = require('find-config'),
     config = require(find('.mon.js')),
     linvodb = require('linvodb3'),
@@ -75,7 +74,8 @@ executor.on('done', (err, code, output, hostname, servicename) => {
     status[hostname][servicename] = {
         status: code,
         output: output,
-        perfdata: perfdata
+        perfdata: perfdata,
+        lastCheck: new Date()
     }
 })
 
@@ -86,7 +86,8 @@ executor.on('error', (err, hostname, servicename) => {
         status[hostname][servicename] = {
             status: status_codes.unkn,
             output: err,
-            perfdata: undefined
+            perfdata: undefined,
+            lastCheck: new Date()
         }
     }
 })

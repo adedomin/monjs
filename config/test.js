@@ -5,7 +5,10 @@ config.dbPath = './db/'
 config.http = {
     port: '9001',
     addr: null, // null = all
-    auth: true
+    auth: true,
+    hostname: 'localhost', // name for rss feed links
+    // leave blank for '/' root
+    root: '' // if you want to use another root dir
 }
 
 config.logger = {

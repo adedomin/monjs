@@ -1,10 +1,10 @@
 {
   "name": "ezios",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "nagios, but more dynamic",
   "main": "index.js",
   "bin": {
-      "monjs": "./bin/monjs"
+    "monjs": "./bin/monjs"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -26,6 +26,7 @@
     "choo": "^3.3.0",
     "cookie-parser": "^1.4.3",
     "express": "^4.14.0",
+    "feed": "^0.3.0",
     "find-config": "^1.0.0",
     "leveldown": "^1.4.6",
     "linvodb3": "^3.25.0",
