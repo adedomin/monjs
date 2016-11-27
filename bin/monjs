@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-__DIRNAME=$(dirname $0)
+__DIRNAME=$(dirname $(readlink "$BASH_SOURCE"))
 VERB=$1
 shift
 

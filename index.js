@@ -92,7 +92,7 @@ executor.on('done', (err, code, output, hostname, servicename) => {
             title: `${hostname} - ${servicename}`,
             description: output,
             date: status[hostname][servicename].lastCheck,
-            link: `${config.http.hostname}:${config.http.port}/#/`
+            link: `${config.http.hostname}${config.http.root}/#/`
         })
     }
 })
