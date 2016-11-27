@@ -35,8 +35,8 @@ module.exports = (data) => html`
       </div>
     </div>
     <footer class="card-footer">
-      <a href="${data.link[0]}" class="card-footer-item">View Timeseries</a>
-      <a href="${data.link[1]}" class="card-footer-item">goto service</a>
+      <a href="#/metrics/${data.title}" class="card-footer-item">View Timeseries</a>
+      <a class="card-footer-item">Recheck Service</a>
     </footer>
   </div>
 `

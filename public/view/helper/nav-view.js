@@ -30,10 +30,10 @@ module.exports = () => {
           <div class="nav-left">
             ${Object.keys(navItems).map(nav => {
                 if (navItems[nav].indexOf(hash) > -1) return html`
-                    <a href="/${navItems[nav]}" class="nav-item is-tab is-active">${nav}</a>
+                    <a href="${navItems[nav]}" class="nav-item is-tab is-active">${nav}</a>
                 `
                 return html`
-                    <a href="/${navItems[nav]}" class="nav-item is-tab">${nav}</a>
+                    <a href="${navItems[nav]}" class="nav-item is-tab">${nav}</a>
                 `
             })}
           </div>

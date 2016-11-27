@@ -24,6 +24,7 @@
     "body-parser": "^1.15.2",
     "bulma": "^0.2.3",
     "choo": "^3.3.0",
+    "circular-buffer": "^1.0.2",
     "cookie-parser": "^1.4.3",
     "express": "^4.14.0",
     "feed": "^0.3.0",
@@ -31,6 +32,7 @@
     "leveldown": "^1.4.6",
     "linvodb3": "^3.25.0",
     "lodash": "^4.17.0",
+    "metrics-graphics": "^2.10.1",
     "perfdata-parser": "^1.0.0",
     "winston": "^2.2.0"
   },

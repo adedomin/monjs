@@ -21,7 +21,7 @@ var http = require('choo/http'),
 module.exports = {
     updateStatus: (data, state, send, done) => {
         http({
-            uri: '/api/v1/status',
+            uri: 'api/v1/status',
             withCredentials: true
         }, (err, res, body) => {
             try {
@@ -46,7 +46,7 @@ module.exports = {
     },
     getHosts: (data, state, send, done) => {
         http({ 
-            uri: '/api/v1/host',
+            uri: 'api/v1/host',
             withCredentials: true
         }, (err, res, body) => {
             try {
@@ -63,7 +63,7 @@ module.exports = {
     },
     getServices: (data, state, send, done) => {
         http({
-            uri: '/api/v1/service', 
+            uri: 'api/v1/service', 
             withCredentials: true
         }, (err, res, body) => {
             try {
@@ -81,7 +81,7 @@ module.exports = {
     getTimeSeries: (data, state, send, done) => {
         http({
             method: 'get',
-            uri: `/api/v1/metrics/${data.service}/${new Date(new Date().getTime() - data.since).toISOString()}`,
+            uri: `api/v1/metrics/${data.service}/${new Date(new Date().getTime() - data.since).toISOString()}`,
             withCredentials: true
         }, (err, res, body) => {
             try {
@@ -100,7 +100,7 @@ module.exports = {
         http({
             method: 'put',
             body: JSON.stringify(state.modalForm),
-            uri: `/api/v1/${data}`,
+            uri: `api/v1/${data}`,
             headers: {
                 'Content-Type': 'application/json'
             },
@@ -132,7 +132,7 @@ module.exports = {
     delObject: (data, state, send, done) => {
         http({
             method: 'delete',
-            uri: `/api/v1/${data}`,
+            uri: `api/v1/${data}`,
             withCredentials: true
         }, (err, res, body) => {
             try {
@@ -159,7 +159,7 @@ module.exports = {
     },
     testAuth: (data, state, send, done) => {
         http({
-            uri: '/api/v1/auth',
+            uri: 'api/v1/auth',
             headers: {
                 'api-key': data
             },

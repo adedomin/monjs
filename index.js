@@ -21,6 +21,7 @@ var find = require('find-config'),
     linvodb = require('linvodb3'),
     Scheduler = require('./lib/Scheduler'),
     Executor = require('./lib/executor'),
+    CircularBuffer = require('circular-buffer'),
     perfparse = require('perfdata-parser'),
     router = require('./lib/route'),
     each = require('async/each'),
@@ -30,14 +31,15 @@ linvodb.dbPath = config.dbPath
 var Host = new linvodb('Host', require('./schema/host'), {}),
     Service = new linvodb('Service', require('./schema/service'), {}),
     Auth = new linvodb('Auth', require('./schema/auth'), {}),
-    TimeSeries = new linvodb('TimeSeries', require('./schema/time-series.js'), {})
+    TimeSeries = new linvodb('TimeSeries', require('./schema/time-series.js'), {}),
+    RSSFeed = new CircularBuffer(66)
 
 // scheduler emits events when services need to run
 var scheduler = new Scheduler(),
     executor = new Executor(),
     status = {},
     logger = require('./lib/logger'),
-    middleware = require('./lib/middleware')(status, Host, Service, Auth, logger, TimeSeries)
+    middleware = require('./lib/middleware')(status, Host, Service, Auth, logger, TimeSeries, RSSFeed)
 
 var status_codes = {
     0: 'OK',
@@ -70,12 +72,28 @@ executor.on('done', (err, code, output, hostname, servicename) => {
         })
     }
 
+    // prevent repeated spam for known failling host
+    var currentlyFailing = false
+    if (status[hostname] && status[hostname][servicename] &&
+        status[hostname][servicename].status != 'OK' && code != 'OK')
+        currentlyFailing = true
+
     if (!status[hostname]) status[hostname] = {}
     status[hostname][servicename] = {
         status: code,
         output: output,
         perfdata: perfdata,
         lastCheck: new Date()
+    }
+    
+    // set fail rss feed if first failure
+    if (code != 'OK' && !currentlyFailing) {
+        RSSFeed.enq({
+            title: `${hostname} - ${servicename}`,
+            description: output,
+            date: status[hostname][servicename].lastCheck,
+            link: `${config.http.hostname}:${config.http.port}/#/`
+        })
     }
 })
 

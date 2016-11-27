@@ -91,8 +91,7 @@ module.exports = (state, prev, send) => html`
                                 status: stat.status,
                                 subtitle: stat.service,
                                 body: stat.output,
-                                smallbody: stat.perfdata || 'no perfdata',
-                                link: [ `#/metrics/${stat.service}`, '/nowhere' ]
+                                smallbody: stat.perfdata || 'no perfdata'
                             })}
                         </div>
                     `
