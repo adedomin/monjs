@@ -28,7 +28,7 @@ module.exports = (state, prev, send) => html`
     <div>
       ${banner(state, send)}
       ${nav()}
-      ${title(`Metrics - ${state.params.service}`)}
+      ${title(`Metrics - ${decodeURIComponent(state.params.service)}`)}
       ${login(state, send)}
       
           <section class="section">
@@ -69,7 +69,7 @@ module.exports = (state, prev, send) => html`
                 <a class="button is-info"
                    onclick=${() => send('getTimeSeries', { 
                        since: +document.getElementById('timeseries-select').value,
-                       service: encodeURIComponent(state.params.service)
+                       service: state.params.service
                    })}>
                   Get timeseries
                 </a>

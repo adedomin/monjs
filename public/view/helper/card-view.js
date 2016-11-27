@@ -35,7 +35,7 @@ module.exports = (data) => html`
       </div>
     </div>
     <footer class="card-footer">
-      <a href="#/metrics/${data.title}" class="card-footer-item">View Timeseries</a>
+      <a href="#/metrics/${encodeURIComponent(data.subtitle)}" class="card-footer-item">View Timeseries</a>
       <a class="card-footer-item">Recheck Service</a>
     </footer>
   </div>
