@@ -57,11 +57,19 @@ module.exports = (state, prev, send) => html`
               <p class="control">
                 <select id="filterSeries-select"
                  oninput=${(e) => send('filterSeriesChange', e.target.value)}>
-                  ${_.map(_.uniqBy(state.timeseries, 'measure'), (uniq) => {
-                      return uniq.measure 
-                  }).map((measure) => html`
-                      <option value="${measure}">${measure}</option>
-                  `)}  
+                  ${(() => { 
+                      var uniqs = _.map(_.uniqBy(state.timeseries, 'measure'), (uniq) => {
+                          return uniq.measure 
+                      })
+                      if (uniqs.length == 1 && state.filterSeries != uniqs[0])
+                          return send('filterSeriesChange', uniqs[0]) 
+                      if (!state.filterSeries || uniqs.indexOf(state.filterSeries) < 0)
+                          return send('filterSeriesChange', uniqs[0]) 
+
+                      return uniqs.map(uniq => html`
+                          <option selected value="${uniq}">${uniq}</option>
+                      `)
+                  })()}
                 </select>
               </p>
               <br>
