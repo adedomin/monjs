@@ -8,7 +8,10 @@ module.exports = (state, send) => {
           <div class="box">
             <p class="control has-addons">
               <input class="input is-expanded" id="secret"
-                     type="password">
+                type="password" onkeydown=${(e) => { 
+                    if (e.keyCode == 13) 
+                        send('testAuth', document.getElementById('secret').value) 
+                }}></input>
               <a class="button is-info"
                  onclick=${() => send('testAuth', document.getElementById('secret').value)}>
                 Login

@@ -65,10 +65,10 @@ module.exports = (state, prev, send) => html`
                         if (uniqs.length == 1 && state.filterSeries != uniqs[0])
                             return send('filterSeriesChange', uniqs[0]) 
                         if (!state.filterSeries || uniqs.indexOf(state.filterSeries) < 0)
-                            return send('filterSeriesChange', uniqs[0]) 
+                            return send('filterSeriesChange', uniqs.slice(-1)[0]) 
 
                         return uniqs.map(uniq => html`
-                            <option selected value="${uniq}">${uniq}</option>
+                            <option value="${uniq}">${uniq}</option>
                         `)
                     })()}
                   </select>
