@@ -17,6 +17,7 @@
  */
 
 // css
+require('../node_modules/metrics-graphics/dist/metricsgraphics.css')
 require('../node_modules/bulma/css/bulma.css')
 
 var choo = require('choo'),
