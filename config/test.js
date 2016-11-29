@@ -6,7 +6,7 @@ config.http = {
     port: '9001',
     addr: null, // null = all
     auth: true,
-    hostname: 'localhost', // name for rss feed links
+    hostname: 'http://localhost:9001', // name for rss feed links
     // leave blank for '/' root
     root: '' // if you want to use another root dir
 }
