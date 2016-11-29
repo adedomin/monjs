@@ -25,7 +25,7 @@ var html = require('choo/html'),
 module.exports = (state, prev, send) => html`
     <div>
       ${banner(state, send)}
-      ${nav()}
+      ${nav(state, send)}
       ${title('Services')}
       ${login(state, send)}
 
@@ -131,7 +131,10 @@ module.exports = (state, prev, send) => html`
 
       <div class="container">
         <div class="columns is-centered is-multiline">
-          ${state.services.map((service) => html`
+          ${state.services.filter(service => {
+              return service.name.indexOf(state.filter) > -1
+                     || state.filterTarget != 'service'
+          }).map(service => html`
               <div class="column is-3">
                 <div class="box">
                   <div class="content">

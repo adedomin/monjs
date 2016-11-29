@@ -22,7 +22,7 @@ var html = require('choo/html'),
         notify: '#/notify'
     }
 
-module.exports = () => {
+module.exports = (state, send) => {
     var hash = window.location.hash
     if (!hash) hash = '#/status'
     return html`
@@ -37,6 +37,25 @@ module.exports = () => {
                     <a href="${navItems[nav]}" class="nav-item is-tab">${nav}</a>
                 `
             })}
+          </div>
+          <div class="nav-right nav-menu">
+            <span class="nav-item">
+              <p class="control has-addons">
+                <span class="select">
+                  <select onchange=${(e) => send('filterTargetChange', e.target.value)}>
+                    <option value="host">host</option>
+                    <option value="service">service</option>
+                  </select>
+                </span>
+                <input
+                  type="text"
+                  class="input is-expanded" 
+                  hint="filter by hostname"
+                  value="${state.filter}"
+                  placeholder="Filter by ${state.filterTarget}"
+                  oninput=${(e) => send('filterChange', e.target.value)}>
+              </p>
+            </span>
           </div>
         </div>
       </nav>

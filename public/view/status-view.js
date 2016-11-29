@@ -26,54 +26,35 @@ var html = require('choo/html'),
 module.exports = (state, prev, send) => html`
     <div>
         ${banner(state, send)}
-        ${nav()}
+        ${nav(state, send)}
         ${title('Status')}
         ${login(state, send)}
     
-        <div class="columns is-gapless has-text-centered">
-            <div class="column">
-              <section class="section">
-                <div class="container">
-                  <div class="heading">
-                    <h1 class="title">Status</h1>
-                    <h2 class="subtitle">${state.status.length}</p>
-                    <a class="button is-link" onclick=${() => send('failFilterChange', false)}>View All »</a>
-                  </div>
+        <div class="columns is-gapless has-text-centered is-multiline">
+          <div class="column is-half">
+            <section class="section">
+              <div class="container">
+                <div class="heading">
+                  <h1 class="title">Status</h1>
+                  <h2 class="subtitle">${state.status.length}</p>
+                  <a class="button is-link" onclick=${() => send('failFilterChange', false)}>View All »</a>
                 </div>
-              </section>
-            </div>
-            <div class="column">
-              <section class="section">
-                <div class="container">
-                  <div class="heading">
-                    <h1 class="title">Failing</h1>
-                    <h2 class="subtitle">
-                        ${state.status.filter(stat => stat.status != 'OK').length}
-                    </h2>
-                    <a class="button is-link" onclick=${() => send('failFilterChange', true)}>View Failing »</a>
-                  </div>
+              </div>
+            </section>
+          </div>
+          <div class="column is-half">
+            <section class="section">
+              <div class="container">
+                <div class="heading">
+                  <h1 class="title">Failing</h1>
+                  <h2 class="subtitle">
+                      ${state.status.filter(stat => stat.status != 'OK').length}
+                  </h2>
+                  <a class="button is-link" onclick=${() => send('failFilterChange', true)}>View Failing »</a>
                 </div>
-              </section>
-            </div>
-            <hr>
-        </div>
-
-        <div class="container">
-            <p class="control has-addons">
-              <span class="select">
-                <select onchange=${(e) => send('filterTargetChange', e.target.value)}>
-                  <option value="host">host</option>
-                  <option value="service">service</option>
-                </select>
-              </span>
-              <input
-                type="text"
-                class="input is-expanded" 
-                hint="filter by hostname"
-                value="${state.filter}"
-                placeholder="Filter by ${state.filterTarget}"
-                oninput=${(e) => send('filterChange', e.target.value)}>
-            </p>
+              </div>
+            </section>
+          </div>
         </div>
 
         <div class="container">

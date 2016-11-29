@@ -26,7 +26,7 @@ var html = require('choo/html'),
 module.exports = (state, prev, send) => html`
     <div>
       ${banner(state, send)}
-      ${nav()}
+      ${nav(state, send)}
       ${title('Hosts')}
       ${login(state, send)}
 
@@ -111,7 +111,10 @@ module.exports = (state, prev, send) => html`
 
       <div class="container">
         <div class="columns is-centered is-multiline">
-          ${state.hosts.map((host) => html`
+          ${state.hosts.filter(host => {
+              return host.name.indexOf(state.filter) > -1 
+                     || state.filterTarget != 'host'
+          }).map(host => html`
               <div class="column is-3">
                 <div class="box">
                   <div class="content">

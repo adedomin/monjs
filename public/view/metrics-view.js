@@ -27,7 +27,7 @@ var html = require('choo/html'),
 module.exports = (state, prev, send) => html`
     <div>
       ${banner(state, send)}
-      ${nav()}
+      ${nav(state, send)}
       ${title(`Metrics - ${decodeURIComponent(state.params.service)}`)}
       ${login(state, send)}
       
