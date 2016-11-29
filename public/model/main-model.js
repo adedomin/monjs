@@ -16,7 +16,8 @@ module.exports = {
         modalForm: {},
         timeseries: [],
         filterSeries: '',
-        auth: true
+        auth: true,
+        rsskey: ''
     },
     effects: effects,
     reducers: reducers,

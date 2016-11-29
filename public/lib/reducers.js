@@ -16,6 +16,9 @@
  */
 
 module.exports = {
+    rsskeyChange: (data, state) => {
+        return Object.assign({}, state, { rsskey: data })
+    },
     enableModal: (data, state) => {
         return Object.assign({}, state, { 
             modalForm: data,

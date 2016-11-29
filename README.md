@@ -57,10 +57,16 @@ In the web ui, args is just a string which is automatically split into an array.
 quoted strings will be converted to a singular argument.
 As stated in the Hosts section, you can access host variables using the \$VAR\$ or \$\_VAR\$ syntax.
 
+Atom/RSS Feeds
+--------------
+
+Currently MonJS does not offer to push failure notifications and likely will not in the future.
+In corporate Nagios deployments, I always used RSS feeds instead of emails or other active push services.
+This way users can choose to listen to the alerts instead of just putting in an outlook filter if they don't care.
+
 TODO
 ----
 
-  * Metrics - Still not working as expected.
   * recheck services prematurely.
   * full-featured command line client.
   * better todo, logo, pictures, etc.

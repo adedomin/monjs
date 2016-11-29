@@ -18,7 +18,8 @@ var html = require('choo/html'),
     navItems = {
         monjs: '#/status',
         hosts: '#/host',
-        services: '#/service'
+        services: '#/service',
+        notify: '#/notify'
     }
 
 module.exports = () => {

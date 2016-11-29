@@ -38,6 +38,8 @@ module.exports = {
                 _.keys(body[host]).map(service => {
                     body[host][service].service = service
                     body[host][service].hostname = host
+                    body[host][service].lastCheck = 
+                        new Date(body[host][service].lastCheck)
                     status.push(body[host][service])
                 })
             })
@@ -94,6 +96,27 @@ module.exports = {
                 return send('errorBanner', 'Could not get timeseries', done)
             
             send('timeseriesChange', body, done)
+        })
+    },
+    getRss: (data, state, send, done) => {
+        http({
+            method: 'get',
+            uri: 'api/v1/key', 
+            withCredentials: true
+        }, (err, res, body) => {
+            try {
+                body = JSON.parse(body)
+            }
+            catch (e) {
+                body = null
+            }
+            if (err || res.statusCode != 200 || !body || body.status == 'error')
+                return send('errorBanner', 'could not get an api-key', done)
+
+            send('rsskeyChange'
+            ,   body.msg.replace('api-key: ', '')
+            ,   done
+            )
         })
     },
     addObject: (data, state, send, done) => {

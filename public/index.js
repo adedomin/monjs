@@ -32,7 +32,8 @@ app.router('/status', (route) => [
     route('/service', require('./view/service-view'), [
         route('/:service', require('./view/service-view'))
     ]),
-    route('/metrics/:service', require('./view/metrics-view'))
+    route('/metrics/:service', require('./view/metrics-view')),
+    route('/notify', require('./view/rss-view')),
 ])
 
 var tree = app.start({ hash: true })
