@@ -194,7 +194,7 @@ module.exports = {
             catch (e) {
                 body = null
             }
-            if (err || res.statusCode != 200 || !body || body.status == 'error') 
+            if (res.statusCode == 403 || res.statusCode == 401)
                 return send('authChange', false, done)
 
             send('authChange', true, () => {
