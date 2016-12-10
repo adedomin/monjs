@@ -1,70 +1,28 @@
-#!/usr/bin/env bash
-# Copyright (C) 2016  prussian <genunrest@gmail.com>
-#
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#!/usr/bin/env node
 
-__DIRNAME=$(dirname $(readlink -f "$BASH_SOURCE" 2>/dev/null|| readlink "$BASH_SOURCE"))
-VERB=$1
-shift
+var verb = process.argv[2],
+    fs = require('fs'),
+    path = require('path')
 
-while [ $# -gt 0 ]; do
-    case "$1" in
-        -H|--hostname)
-            shift
-            HOST=$1
-            ;;
-        -a|--address)
-            shift
-            ADDRESS=$1
-            ;;
-        -e|--extra)
-            shift
-            EXTRA=$1
-            ;;
-        -s|--service)
-            SERVICE=$1
-            ;;
-        -c|--command)
-            shift
-            COMMAND=$1
-            ;;
-        -A|--args)
-            shift
-            ARGS=$1
-            ;;
-        -i|--interval)
-            shift
-            INTERVAL=$1
-            ;;
-    esac
-    shift
-done
-
-if [ "$VERB" = 'init' ]; then
-    if [ -n "$XDG_CONFIG_HOME" ]; then
-        cp "$__DIRNAME/../config/test.js" "$XDG_CONFIG_HOME/mon.js" || ( echo "failed to write config"; exit 1)
-        echo "Configurations written to $XDG_CONFIG_HOME/mon.js"
+if (verb == 'init') {
+    var configpath = ''
+    if (process.env.XDG_CONFIG_HOME)
+        configpath = process.env.XDG_CONFIG_HOME
+    else if (process.env.HOME)
+        configpath = process.env.HOME
     else
-        cp "$__DIRNAME/../config/test.js" "$HOME/.mon.js" || ( echo "failed to write config "; exit 1)
-        echo "Configurations written to $HOME/.mon.js"
-    fi
+        throw 'No valid environment to store configs'
 
-    echo "Please make sure to change the default secret key"
-    echo "Also it is recommended to set the PATH var in the config to point to your nagios compatible test scripts"
-    exit 0
-fi
+    fs.createReadStream(
+        path.join(__dirname, '../config/test.js')
+    ).pipe(fs.createWriteStream(
+        path.join(configpath, '.mon.js')
+    ))
 
-if [ "$VERB" = 'start' ]; then
-    /usr/bin/env node "$__DIRNAME/../index.js"
-fi
+    console.log(`Configuration was written to ${path.join(configpath, '.mon.js')}.
+Please make sure to change the defaults.`)
+}
+else if (verb == 'start') {
+    require(path.join(__dirname, '../index.js'))
+}
+
