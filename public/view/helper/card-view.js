@@ -35,7 +35,7 @@ module.exports = (data) => html`
     </div>
     <footer class="card-footer">
       <a href="#/metrics/${encodeURIComponent(data.subtitle)}" class="card-footer-item">View Timeseries</a>
-      <a class="card-footer-item">Recheck (Last: ${relative(data.date)})</a>
+      <a class="card-footer-item" onclick=${data.recheck}>Recheck (Last: ${relative(data.date)})</a>
     </footer>
   </div>
 `

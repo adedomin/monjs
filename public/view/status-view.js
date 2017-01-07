@@ -72,7 +72,8 @@ module.exports = (state, prev, send) => html`
                                 status: stat.status,
                                 subtitle: stat.service,
                                 body: stat.output,
-                                date: stat.lastCheck
+                                date: stat.lastCheck,
+                                recheck: send.bind(this, 'recheckService', stat.service, () => {})
                             })}
                         </div>
                     `

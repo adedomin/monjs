@@ -25,7 +25,7 @@ var find = require('find-config'),
     perfparse = require('perfdata-parser'),
     router = require('./lib/route'),
     each = require('async/each'),
-    _ = require('lodash')
+    _ = Object
 
 linvodb.dbPath = config.dbPath
 var Host = new linvodb('Host', require('./schema/host'), {}),
@@ -48,11 +48,18 @@ var status_codes = {
     unkn: 'UNKN'
 }
 
-router(middleware)
+var recheck = router(middleware)
 
 scheduler.on('service.external', (host, service) => {
     logger.log('debug', `${host.name}:${service.name} event triggered`)
     executor.exec(host, service)
+})
+
+recheck.on('recheck', (service) => {
+    Service.find({ name: service }, (err, services) => {
+        if (err) return
+        bulkadd(services)
+    })
 })
 
 executor.on('done', (err, code, output, hostname, servicename) => {

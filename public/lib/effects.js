@@ -207,5 +207,23 @@ module.exports = {
                 })
             })
         })
+    },
+    recheckService: (data, state, send, done) => {
+        http({
+            uri: `api/v1/service/recheck/${encodeURIComponent(data)}`,
+            withCredentials: true
+        }, (err, res, body) => {
+            try {
+                body = JSON.parse(body)
+            }
+            catch (e) {
+                body = null
+            }
+
+            if (err || res.statusCode != 200 || !body || body.status == 'error') {
+                return send('errorBanner', 'Error rechecking service', done)
+            }
+            send('okBanner', body.msg, done)
+        }) 
     }
 }
