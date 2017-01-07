@@ -72,7 +72,7 @@ module.exports = (state, prev, send) => html`
                                 status: stat.status,
                                 subtitle: stat.service,
                                 body: stat.output,
-                                smallbody: `${stat.lastCheck.toLocaleTimeString()} ${stat.lastCheck.toLocaleDateString()}`
+                                date: stat.lastCheck
                             })}
                         </div>
                     `

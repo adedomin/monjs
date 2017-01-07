@@ -16,7 +16,8 @@
  */
 
 var html = require('choo/html'),
-    status_colors = require('../../lib/status-colors')
+    status_colors = require('../../lib/status-colors'),
+    relative = require('relative-date')
 
 module.exports = (data) => html`
   <div class="card is-fullwidth">
@@ -30,13 +31,11 @@ module.exports = (data) => html`
     <div class="card-content">
       <div class="content">
         ${data.body} 
-        <br>
-        <small>${data.smallbody}</small>
       </div>
     </div>
     <footer class="card-footer">
       <a href="#/metrics/${encodeURIComponent(data.subtitle)}" class="card-footer-item">View Timeseries</a>
-      <a class="card-footer-item">Recheck Service</a>
+      <a class="card-footer-item">Recheck (Last: ${relative(data.date)})</a>
     </footer>
   </div>
 `

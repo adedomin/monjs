@@ -16,7 +16,7 @@
  */
 
 var http = require('choo/http'),
-    _ = require('lodash')
+    _ = Object
 
 module.exports = {
     updateStatus: (data, state, send, done) => {
