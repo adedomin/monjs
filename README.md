@@ -64,6 +64,17 @@ Currently MonJS does not offer to push failure notifications and likely will not
 In corporate Nagios deployments, I always use RSS feeds instead of emails or other active push services.
 This way users can choose to listen to the alerts instead of filtering the emails to the trash if they don't care.
 
+Screenshots
+-----------
+
+![Status Page](docs/media/status.png)
+
+![Host Modal](docs/media/host.png)
+
+![Service Modal](docs/media/service.png)
+
+![Services](docs/media/service2.png)
+
 TODO
 ----
 
