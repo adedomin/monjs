@@ -78,6 +78,5 @@ Screenshots
 TODO
 ----
 
-  * recheck services prematurely.
   * full-featured command line client.
-  * better todo, logo, pictures, etc.
+  * logo?
