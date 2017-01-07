@@ -75,6 +75,8 @@ Screenshots
 
 ![Services](docs/media/service2.png)
 
+![Metrics](docs/media/metrics.png)
+
 TODO
 ----
 
