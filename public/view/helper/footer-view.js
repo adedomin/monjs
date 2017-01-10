@@ -26,7 +26,7 @@ module.exports = () => {
               </p>
               <p>
                 <a class="icon" href="https://github.com/GeneralUnRest/ezios">
-                  <i class="fa fa-github"></i>
+                    <img src="Github-Mark-120px-plus.png">
                 </a>
               </p>
             </div>
