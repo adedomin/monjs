@@ -1,6 +1,6 @@
 {
   "name": "ezios",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "nagios, but more dynamic",
   "main": "index.js",
   "bin": {
