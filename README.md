@@ -1,6 +1,9 @@
 MonJS
 =====
 
+A monitoring wep application tool that leverages nagios-like tools and idioms.
+Unlike nagios-core, this tool has a full-featured web ui to dynamically configure hosts and services.
+
 init
 ----
 
