@@ -51,6 +51,11 @@ var status_codes = {
 router(middleware)
 
 scheduler.on('service.external', (host, service) => {
+    if (!host) {
+        // ???
+        logger.log('error', `host is null in scheduler for ${service.name}`)
+        return scheduler.deltask(service)
+    }
     logger.log('debug', `${host.name}:${service.name} event triggered`)
     executor.exec(host, service)
 })
@@ -126,10 +131,7 @@ var bulkadd = (services) => {
 }
 
 Service.on('inserted', bulkadd)
-
-Service.on('updated', (services) => {
-    bulkadd(services)
-})
+Service.on('updated', bulkadd)
 
 Service.on('remove', (service) => {
     scheduler.deltask(service)
@@ -138,6 +140,7 @@ Service.on('remove', (service) => {
 })
 
 Host.on('remove', (host) => {
+    logger.log('info', `services for ${host.name} are not deleted`)
     Service.find({ host: host.name }, (err, services) => {
         if (err) return
         each(services, (service, cb) => {
@@ -145,7 +148,6 @@ Host.on('remove', (host) => {
             cb()
         })
     })
-    
     delete status[host.name]
 })
 
