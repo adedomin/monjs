@@ -48,18 +48,11 @@ var status_codes = {
     unkn: 'UNKN'
 }
 
-var recheck = router(middleware)
+router(middleware)
 
 scheduler.on('service.external', (host, service) => {
     logger.log('debug', `${host.name}:${service.name} event triggered`)
     executor.exec(host, service)
-})
-
-recheck.on('recheck', (service) => {
-    Service.find({ name: service }, (err, services) => {
-        if (err) return
-        bulkadd(services)
-    })
 })
 
 executor.on('done', (err, code, output, hostname, servicename) => {
@@ -135,13 +128,7 @@ var bulkadd = (services) => {
 Service.on('inserted', bulkadd)
 
 Service.on('updated', (services) => {
-    each(services, (service, cb) => {
-        scheduler.deltask(service)
-        cb()
-    }, (err) => {
-        if (err) return
-        bulkadd(services)
-    })
+    bulkadd(services)
 })
 
 Service.on('remove', (service) => {
