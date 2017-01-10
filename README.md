@@ -57,6 +57,12 @@ In the web ui, args is just a string which is automatically split into an array.
 quoted strings will be converted to a singular argument.
 As stated in the Hosts section, you can access host variables using the \$VAR\$ or \$\_VAR\$ syntax.
 
+Limitations
+-----------
+
+All service changes will trigger a service to fire.
+This includes changing service variables, renaming the service's host's name, etc.
+
 Atom/RSS Feeds
 --------------
 
