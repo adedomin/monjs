@@ -25,8 +25,6 @@ var graph = (timedata, filter) => {
         data: timedata,
         width: 600,
         height: 400,
-        missing_is_zero: true,
-        utc_time: true,
         target: el,
         x_accessor: 'date',
         y_accessor: 'value'
