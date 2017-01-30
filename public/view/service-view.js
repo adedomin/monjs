@@ -114,10 +114,7 @@ module.exports = (state, prev, send) => html`
           </div>
           <footer class="modal-card-foot">
             <a onclick=${() => send('addObject', 'service')} class="button is-success">
-              <span class="icon">
-                <i class="fa fa-check"></i>
-              </span>
-              <span>Save</span>
+              Save
             </a>
             <a onclick=${() => send('cancelModal')} class="button">
               Cancel
