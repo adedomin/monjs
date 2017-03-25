@@ -13,11 +13,17 @@ init
     # will create the default configuration file.
     monjs init 
 
+    # write default config to /etc/monjs
+    monjs init -c /etc/monjs
+
     # will start the application
-    monjs start
+    monjs
+
+    # start application with different config
+    monjs -c /etc/monjs
 
     # launch into background
-    monjs start > monjs.log & disown
+    monjs > monjs.log & disown
 
 Make sure to edit the configuration file before use; the init command will indicate where it was saved.
 
