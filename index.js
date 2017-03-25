@@ -16,8 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-var find = require('find-config'),
-    config = require(find('.mon.js')),
+var env = require('process').env,
+    config = require(env.CONFIG_PATH),
     linvodb = require('linvodb3'),
     Scheduler = require('./lib/Scheduler'),
     Executor = require('./lib/executor'),

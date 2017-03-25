@@ -20,7 +20,14 @@ var html = require('choo/html'),
     nav = require('./helper/nav-view'),
     footer = require('./helper/footer-view'),
     title = require('./helper/title-view'),
-    login = require('./helper/login-view')
+    login = require('./helper/login-view'),
+    shlex = require('shell-quote').parse,
+    unit_values = {
+        Milisecond: 1,
+        Second: 1000,
+        Minute: 60000,
+        Hour: 3600000
+    }
 
 module.exports = (state, prev, send) => html`
     <div>
@@ -80,7 +87,7 @@ module.exports = (state, prev, send) => html`
                    value="${state.modalForm.argstring}"
                    oninput=${(e) => send('modalFormChange', { 
                        argstring: e.target.value,
-                       args: e.target.value.split(/\s+(?=(?:[^\'\"]*[\'\"][^\'\"]*[\'\"])*[^\'\"]*$)/)
+                       args: shlex(e.target.value)
                    })}>
                 </p>
                 <label class="label">Interval</label>
@@ -97,12 +104,17 @@ module.exports = (state, prev, send) => html`
                      <select 
                       id="intervalUnit"
                       onchange=${(e) => send('modalFormChange', {
-                          interval:  +e.target.value * +state.modalForm.time 
+                          interval:  +e.target.value * +state.modalForm.time,
+                          unit: e.target.options[e.target.selectedIndex].text
                       })}>
-                      <option value="1">Milisecond</option>
-                      <option value="1000">Second</option>
-                      <option value="60000">Minute</option>
-                      <option value="3600000">Hour</option>
+                      ${Object.keys(unit_values).map(val => {
+                          if (state.modalForm.unit == val) {
+                              return html`<option selected value="${unit_values[val]}">${val}</option>
+                              `
+                          }
+                          return html`<option value="${unit_values[val]}">${val}</option>
+                          `
+                      })}
                     </select>
                   </span>
                 </p>
