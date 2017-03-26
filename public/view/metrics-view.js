@@ -62,9 +62,8 @@ module.exports = (state, prev, send) => html`
                         var uniqs = _.map(_.uniqBy(state.timeseries, 'measure'), (uniq) => {
                             return uniq.measure 
                         })
-                        if (uniqs.length == 1 && state.filterSeries != uniqs[0])
-                            return send('filterSeriesChange', uniqs[0]) 
-                        if (!state.filterSeries || uniqs.indexOf(state.filterSeries) < 0)
+                        if ((!state.filterSeries && uniqs.length > 0)
+                            || (uniqs.length > 0 && uniqs.indexOf(state.filterSeries) < 0))
                             return send('filterSeriesChange', uniqs.slice(-1)[0]) 
 
                         return uniqs.map(uniq => html`
