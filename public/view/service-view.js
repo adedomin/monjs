@@ -87,7 +87,9 @@ module.exports = (state, prev, send) => html`
                    value="${state.modalForm.argstring}"
                    oninput=${(e) => send('modalFormChange', { 
                        argstring: e.target.value,
-                       args: shlex(e.target.value)
+                       args: shlex(
+                           e.target.value.replace(/\$/g, '\\$')
+                       )
                    })}>
                 </p>
                 <label class="label">Interval</label>

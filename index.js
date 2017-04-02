@@ -61,6 +61,7 @@ scheduler.on('service.external', (host, service) => {
 })
 
 executor.on('done', (err, code, output, hostname, servicename) => {
+    var check_date = new Date()
     logger.log('debug', `exec'd ${hostname}:${servicename} => ${output}`)
     var perfdata = perfparse(output)
     code = status_codes[code] || status_codes.unkn
@@ -68,7 +69,7 @@ executor.on('done', (err, code, output, hostname, servicename) => {
     if (perfdata) {
         _.keys(perfdata).map((key) => {
             TimeSeries.insert({
-                date: new Date(),
+                date: check_date,
                 service: servicename,
                 measure: key,
                 value: +perfdata[key].value || 0,
@@ -79,9 +80,32 @@ executor.on('done', (err, code, output, hostname, servicename) => {
 
     // prevent repeated spam for known failling host
     var currentlyFailing = false
+    // note that boolean expressions don't always return true or false
     if (status[hostname] && status[hostname][servicename] &&
         status[hostname][servicename].status != 'OK' && code != 'OK')
         currentlyFailing = true
+
+    // set fail rss feed if first failure
+    if (code != 'OK' && !currentlyFailing) {
+        RSSFeed.enq({
+            title: `FAILING -> ${hostname} - ${servicename}`,
+            description: output,
+            date: check_date,
+            link: `${config.http.hostname}${config.http.root}/#/`
+        })
+    }
+    // if a service has recovered
+    else if (code == 'OK' && ( status[hostname] &&
+                               status[hostname][servicename] && 
+                               status[hostname][servicename].status != 'OK' )
+    ) {
+        RSSFeed.enq({
+            title: `RECOVERED -> ${hostname} - ${servicename}`,
+            description: output,
+            date: check_date,
+            link: `${config.http.hostname}${config.http.root}/#/`
+        })
+    }
 
     if (!status[hostname]) status[hostname] = {}
     status[hostname][servicename] = {
@@ -89,16 +113,6 @@ executor.on('done', (err, code, output, hostname, servicename) => {
         output: output,
         perfdata: perfdata,
         lastCheck: new Date()
-    }
-    
-    // set fail rss feed if first failure
-    if (code != 'OK' && !currentlyFailing) {
-        RSSFeed.enq({
-            title: `${hostname} - ${servicename}`,
-            description: output,
-            date: status[hostname][servicename].lastCheck,
-            link: `${config.http.hostname}${config.http.root}/#/`
-        })
     }
 })
 
