@@ -16,7 +16,7 @@
     "nagios",
     "monjs"
   ],
-  "repository": "https://github.com/GeneralUnRest/ezios.git",
+  "repository": "https://github.com/adedomin/ezios.git",
   "author": "Anthony DeDominic <anthony@dedominic.pw>",
   "license": "GPL-3.0+",
   "dependencies": {
