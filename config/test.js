@@ -9,12 +9,12 @@ config.http = {
     auth: true, // do not disable
     hostname: 'http://localhost:9001', // name for rss feed links
     // leave blank for '/' root
-    root: '' // if you want to use another root dir
+    root: '', // if you want to use another root dir
 }
 
 // see: https://github.com/winstonjs/winston#logging-levels
 config.logger = {
-    level: 'debug'
+    level: 'debug',
 }
 
 // set these environments at start
@@ -25,7 +25,7 @@ config.logger = {
 // Currently no account creation, use a secret key for now
 config.env = {
     PATH: `${process.env.PATH}:/usr/lib/monitoring-plugins/`,
-    API_KEY: 'a secret =]'
+    API_KEY: 'a secret =]',
 }
 
 for (var key in config.env) {

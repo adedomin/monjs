@@ -21,34 +21,30 @@ var env = require('process').env,
     linvodb = require('linvodb3'),
     Scheduler = require('./lib/Scheduler'),
     Executor = require('./lib/executor'),
-    CircularBuffer = require('circular-buffer'),
     perfparse = require('perfdata-parser'),
-    router = require('./lib/route'),
-    each = require('async/each'),
-    _ = Object
+    each = require('async').each
 
 linvodb.dbPath = config.dbPath
-var Host = new linvodb('Host', require('./schema/host'), {}),
-    Service = new linvodb('Service', require('./schema/service'), {}),
-    Auth = new linvodb('Auth', require('./schema/auth'), {}),
-    TimeSeries = new linvodb('TimeSeries', require('./schema/time-series.js'), {}),
-    RSSFeed = new CircularBuffer(66)
 
 // scheduler emits events when services need to run
 var scheduler = new Scheduler(),
     executor = new Executor(),
-    status = {},
-    logger = require('./lib/logger'),
-    middleware = require('./lib/middleware')(status, Host, Service, Auth, logger, TimeSeries, RSSFeed)
+    status = require('./lib/model/status'),
+    logger = require('./lib/logger')
+
+var Host = require('./lib/model/host'),
+    RSSFeed = require('./lib/model/rss'),
+    Service = require('./lib/model/service'),
+    TimeSeries = require('./lib/model/time-series')
 
 var status_codes = {
     0: 'OK',
     1: 'WARN',
     2: 'CRIT',
-    unkn: 'UNKN'
+    unkn: 'UNKN',
 }
 
-router(middleware)
+require('./lib/route')
 
 scheduler.on('service.external', (host, service) => {
     if (!host) {
@@ -67,13 +63,13 @@ executor.on('done', (err, code, output, hostname, servicename) => {
     code = status_codes[code] || status_codes.unkn
 
     if (perfdata) {
-        _.keys(perfdata).map((key) => {
+        Object.keys(perfdata).forEach((key) => {
             TimeSeries.insert({
                 date: check_date,
                 service: servicename,
                 measure: key,
                 value: +perfdata[key].value || 0,
-                oum: perfdata[key].oum || ''
+                oum: perfdata[key].oum || '',
             })
         })
     }
@@ -91,7 +87,7 @@ executor.on('done', (err, code, output, hostname, servicename) => {
             title: `FAILING -> ${hostname} - ${servicename}`,
             description: output,
             date: check_date,
-            link: `${config.http.hostname}${config.http.root}/#/`
+            link: `${config.http.hostname}${config.http.root}/#/`,
         })
     }
     // if a service has recovered
@@ -103,16 +99,16 @@ executor.on('done', (err, code, output, hostname, servicename) => {
             title: `RECOVERED -> ${hostname} - ${servicename}`,
             description: output,
             date: check_date,
-            link: `${config.http.hostname}${config.http.root}/#/`
+            link: `${config.http.hostname}${config.http.root}/#/`,
         })
     }
 
     if (!status[hostname]) status[hostname] = {}
     status[hostname][servicename] = {
         status: code,
-        output: output,
-        perfdata: perfdata,
-        lastCheck: new Date()
+        output,
+        perfdata,
+        lastCheck: new Date(),
     }
 })
 
@@ -124,7 +120,7 @@ executor.on('error', (err, hostname, servicename) => {
             status: status_codes.unkn,
             output: err,
             perfdata: undefined,
-            lastCheck: new Date()
+            lastCheck: new Date(),
         }
     }
 })

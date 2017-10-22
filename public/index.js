@@ -18,12 +18,13 @@
 
 // css
 require('../node_modules/metrics-graphics/dist/metricsgraphics.css')
+require('./index.css')
 require('../node_modules/bulma/css/bulma.css')
 
 var choo = require('choo'),
     app = choo()
 
-app.model(require('./model/main-model'))
+app.use(require('./model/main-model'))
 
 app.router('/status', (route) => [
     route('/status', require('./view/status-view')),
